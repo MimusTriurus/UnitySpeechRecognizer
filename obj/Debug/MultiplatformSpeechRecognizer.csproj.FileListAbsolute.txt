@@ -1,0 +1,9 @@
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\MultiplatformSpeechRecognizer.dll
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\MultiplatformSpeechRecognizer.pdb
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\UnityEngine.dll
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\UnityEngine.xml
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.dll
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.pdb
+E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.dll
+E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.pdb
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.csprojResolveAssemblyReference.cache
