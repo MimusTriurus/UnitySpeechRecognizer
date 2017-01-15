@@ -5,31 +5,58 @@ using System.Text;
 
 namespace JavaWrapperMethodNamesNamespace
 {
+    /// <summary>
+    /// имена методов импортируемых из android библиотеки
+    /// </summary>
     public static class JavaWrapperMethodNames
     {
-        // устанавливает имя объекта принимающего колбэки из библиотеки
+        /// <summary>
+        /// устанавливает имя объекта принимающего колбэки из библиотеки 
+        /// </summary>
         public const string SET_RECIEVER_OBJECT_NAME = "setRecieverObjectName";
-        // устанавливает имя метода-приёмника лога из библиотеки
+        /// <summary>
+        /// устанавливает имя метода-приёмника лога из библиотеки 
+        /// </summary>
         public const string SET_LOG_RECIEVER_METHOD_NAME = "setLogReceiverMethodName";
-        // устанавливает имя метода-приёмника результатов распознавания
+        /// <summary>
+        /// устанавливает имя метода-приёмника результатов распознавания 
+        /// </summary>
         public const string SET_RECOGNITION_RESULT_RECIEVER_METHOD = "setRecognitionResultRecieverMethod";
-        // устанавливает имя метода-приёмника промежуточных результатов
+        /// <summary>
+        /// устанавливает имя метода-приёмника промежуточных результатов 
+        /// </summary>
         public const string SET_RECOGNITION_PARTIAL_RESULT_RECEIVER_METHOD = "setRecognitionPartialResultRecieverMethod";
-        // устанавливает имя метода-приёмника рузультатов инициализации распознавателя
+        /// <summary>
+        /// устанавливает имя метода-приёмника рузультатов инициализации распознавателя 
+        /// </summary>
         public const string SET_INITIALIZATION_COMPLETE_METHOD = "setInitializationCompleteMethod";
-        // метод начала инициализации распознаваетля
+        /// <summary>
+        /// метод начала инициализации распознаваетля 
+        /// </summary>
         public const string RUN_RECOGNIZER_SETUP = "runRecognizerSetup";
-        // устанавливает временной интервал ожидания получения звука с микрофона
+        /// <summary>
+        /// устанавливает временной интервал ожидания получения звука с микрофона 
+        /// </summary>
         public const string SET_TIMEOUT_INTERVAL = "setTimeoutInterval";
-        // устанавливает актуальный файл грамматики (устарел?)
+        /// <summary>
+        /// устанавливает актуальный файл грамматики (устарел?) 
+        /// </summary>
         public const string SET_BASE_GRAMMAR_FILE = "setBaseGrammarFile";
-        // переключает файл грамматики
+        /// <summary>
+        /// переключает файл грамматики 
+        /// </summary>
         public const string SWITCH_SEARCH = "switchSearch";
-        // добавляет перед инициализацией доступные для распознавания файлы грамматики
+        /// <summary>
+        /// добавляет перед инициализацией доступные для распознавания файлы грамматики 
+        /// </summary>
         public const string ADD_GRAMMAR_FILE = "addGrammarFile";
-        // инициирует начало распознавания с базовым файлом грамматики
+        /// <summary>
+        /// инициирует начало распознавания с базовым файлом грамматики 
+        /// </summary>
         public const string START_LISTENING = "startListening";
-        // прекращает распознавание
+        /// <summary>
+        /// прекращает распознавание 
+        /// </summary>
         public const string STOP_LISTENING = "stopListening";
     }
 }

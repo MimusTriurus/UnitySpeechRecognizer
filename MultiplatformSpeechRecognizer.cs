@@ -9,9 +9,6 @@ namespace MultiplatformSpeechRecognizerNamespace
 {
     public class MultiplatformSpeechRecognizer
     {
-        private delegate void ToLog(string message);
-        private event ToLog toLog;
-
         private BaseSpeechRecognizer _speechRecognizer = null;
 
         public MultiplatformSpeechRecognizer(MonoBehaviour parent)
@@ -40,8 +37,15 @@ namespace MultiplatformSpeechRecognizerNamespace
             bool isOk = initFileSystem(language, grammars);
             if (isOk)
                 initSpeechRecognizer(language, grammars);
+            else
+                Debug.Log("error on init file system");
         }
-
+        /// <summary>
+        /// формируем иерархию папок, актуальный словарь и файлы грамматики на основании массива структур грамматики
+        /// </summary>
+        /// <param name="language">целевой язык</param>
+        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <returns></returns>
         private bool initFileSystem(string language, GrammarFileStruct[] grammars)
         {
             string targetPath = string.Empty;
@@ -51,7 +55,7 @@ namespace MultiplatformSpeechRecognizerNamespace
                 case RuntimePlatform.WindowsEditor: targetPath = Application.streamingAssetsPath; break;
                 case RuntimePlatform.LinuxPlayer:; break;
             }
-
+            Debug.Log("target path:" + targetPath);
             bool isOk = false;
             isOk = initDictionary(targetPath, language, grammars);
             if (isOk)
@@ -65,13 +69,24 @@ namespace MultiplatformSpeechRecognizerNamespace
         {
             _speechRecognizer.initialization(language, grammars);
         }
-
+        /// <summary>
+        /// создаём файлы грамматики
+        /// </summary>
+        /// <param name="targetPath">целевая директория куда будут скопированы файлы грамматики</param>
+        /// <param name="language">целевой язык(базовая дирректория)</param>
+        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
         private void initGrammarFiles(string targetPath, string language, GrammarFileStruct[] grammars)
         {
             GrammarFilesCreator grammarFileCreator = new GrammarFilesCreator(targetPath, language);
             grammarFileCreator.createGrammarFiles(grammars);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="targetPath">целевая директория куда будут скопирован актуальный словарь</param>
+        /// <param name="language">целевой язык(базовая дирректория)</param>
+        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <returns></returns>
         private bool initDictionary(string targetPath, string language, GrammarFileStruct[] grammars)
         {
             string sourcePath = Application.streamingAssetsPath;
@@ -108,7 +123,6 @@ namespace MultiplatformSpeechRecognizerNamespace
         {
             if (_speechRecognizer != null)
                 _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
-            this.toLog += messagesReciever.getLogMessages;
         }
 
         public void setInitResultMethod(IGetSpeechRecognizerInitResult resultReciever)

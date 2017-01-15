@@ -10,10 +10,14 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 {
     public class AndroidSpeechRecognizer : BaseSpeechRecognizer
     {
+        /// <summary>
+        /// SpeechRecognizer из нативной android библиотеки
+        /// </summary>
         private AndroidJavaObject _recognizerActivity = null;
-
-        private const string INIT_IS_OK = "ok";
-
+        /// <summary>
+        /// метод-приёмник сообщений отладки из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="message"></param>
         private void onCallbackLogFromJavaLib(string message)
         {
             if (this.logFromRecognizer != null)
@@ -21,7 +25,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
                 this.logFromRecognizer.Invoke(message);
             }
         }
-
+        /// <summary>
+        /// метод-приёмник результатов инициализации SpeechRecognizer из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="message"></param>
         private void onCallbackInitResultFromJavaLib(string message)
         {
             _init = true;
@@ -33,7 +40,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
                     this.initializationResult.Invoke(true);
             }
         }
-
+        /// <summary>
+        /// метод-приёмник промежуточных результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="message"></param>
         private void onRecognitionPartialResult(string message)
         {
             if (this.partialRecognitionResult != null)
@@ -41,7 +51,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
                 this.partialRecognitionResult.Invoke(message);
             }
         }
-
+        /// <summary>
+        /// метод-приёмник результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="message"></param>
         private void onRecognitionResult(string message)
         {
             if (this.recognitionResult != null)
