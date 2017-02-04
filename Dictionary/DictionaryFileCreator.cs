@@ -52,6 +52,7 @@ namespace DictionaryNamespace
             {
                 case RuntimePlatform.Android: readBaseDictionaryFromAndroidAssets(sourcePath, language); break;
                 case RuntimePlatform.WindowsEditor: readBaseDictionaryOnDesktop(sourcePath, language); break;
+                case RuntimePlatform.WindowsPlayer: readBaseDictionaryOnDesktop(sourcePath, language); break;
             }
             prepareFilePathDictionary(targetPath, language);
         }
@@ -68,7 +69,8 @@ namespace DictionaryNamespace
             {
                 Debug.Log("wait");
             }
-            string dataText = reader.text;
+            // все слова в нижний регистр
+            string dataText = reader.text.ToLower();
             _transriptionContainer = dataText.TrimEnd('\n').Split('\n').ToDictionary(item => item.Split(' ')[0], item => item.ToString());
                         
         }
@@ -82,10 +84,10 @@ namespace DictionaryNamespace
             baseDictinaryDestination += "/" + language + "/dictionaries/" + BASE_DICTIONARY_NAME + FILE_EXTENSION;
             if (File.Exists(baseDictinaryDestination))
             {
-                Debug.Log("file exist");
                 string dataText = File.ReadAllText(baseDictinaryDestination);
+                // все слова в нижний регистр
+                dataText = dataText.ToLower();
                 _transriptionContainer = dataText.TrimEnd('\n').Split('\n').ToDictionary(item => item.Split(' ')[0], item => item.ToString());
-                Debug.Log("count:" + _transriptionContainer.Count.ToString());
             }
             else
             {
@@ -119,6 +121,7 @@ namespace DictionaryNamespace
             if (words.Count == 0)
             {
                 _isOK = false;
+                Debug.Log("word count = 0");
                 return;
             }
 
@@ -133,6 +136,7 @@ namespace DictionaryNamespace
                 }
                 else
                 {
+                    Debug.Log("not contains:" + word);
                     _isOK = false;
                 }
             }

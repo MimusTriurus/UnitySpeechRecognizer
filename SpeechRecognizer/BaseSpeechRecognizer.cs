@@ -3,6 +3,9 @@ using GrammarNamespace;
 
 namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 {
+    /// <summary>
+    /// базовый класс распознования голоса. От него наследуют классы WindowsSpeechRecognizer, AndroidSpeechRecognizer, LinuxSpeechRecognizer
+    /// </summary>
     public abstract class BaseSpeechRecognizer : MonoBehaviour
     {
         /// <summary>
@@ -17,8 +20,19 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// если инициализация speechRecognizer успешна
         /// </summary>
         protected const string INIT_IS_OK = "initComplete";
-
+        /// <summary>
+        /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
+        /// </summary>
+        protected static BaseSpeechRecognizer _instance = null;
+        /// <summary>
+        /// делегат возврата строки (использует сигналы - logFromRecognizer, partialRecognitionResult, recognitionResult)
+        /// </summary>
+        /// <param name="value"></param>
         public delegate void ReturnStringValue(string value);
+        /// <summary>
+        /// делегат возврата булева значения (использует сигнал - initializationResult)
+        /// </summary>
+        /// <param name="value"></param>
         public delegate void ReturnBoolValue(bool value);
         /// <summary>
         /// сигнал с сообщением отладки из библиотеки распознования

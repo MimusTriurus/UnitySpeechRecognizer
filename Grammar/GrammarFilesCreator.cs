@@ -62,6 +62,7 @@ namespace GrammarNamespace
 
             for (int i = 0; i < words.Length; i++)
             {
+                words[i] = words[i];
                 file.Write(words[i]);
                 if (i != words.Length - 1)
                     file.Write(" | ");

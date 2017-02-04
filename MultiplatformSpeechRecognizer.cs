@@ -11,13 +11,17 @@ namespace MultiplatformSpeechRecognizerNamespace
     {
         private BaseSpeechRecognizer _speechRecognizer = null;
 
+        /// <summary>
+        /// конструктор
+        /// </summary>
+        /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
         public MultiplatformSpeechRecognizer(MonoBehaviour parent)
         {
-            //toLog("try initSpeechRecognizer:" + Application.platform.ToString());
             switch (Application.platform)
             {
                 case RuntimePlatform.Android: parent.gameObject.AddComponent<AndroidSpeechRecognizer>(); break;
                 case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
+                case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
                 case RuntimePlatform.LinuxPlayer:; break;
             }
             _speechRecognizer = parent.GetComponent<BaseSpeechRecognizer>();
@@ -32,13 +36,28 @@ namespace MultiplatformSpeechRecognizerNamespace
         public void init(string language, GrammarFileStruct[] grammars)
         {
             if (_speechRecognizer == null)
+            {
+                logFromRecognizer("speech is empty");
                 return;
+            }
+                
+            // все слова в нижний регистр
+            foreach (GrammarFileStruct grammar in grammars)
+            {
+                for (int i = 0; i < grammar.words.Length; i++)
+                {
+                    grammar.words[i] = grammar.words[i].ToLower();
+                }
+            }
 
             bool isOk = initFileSystem(language, grammars);
             if (isOk)
                 initSpeechRecognizer(language, grammars);
             else
+            {
+                logFromRecognizer("error on init file system");
                 Debug.Log("error on init file system");
+            }
         }
         /// <summary>
         /// формируем иерархию папок, актуальный словарь и файлы грамматики на основании массива структур грамматики
@@ -53,9 +72,10 @@ namespace MultiplatformSpeechRecognizerNamespace
             {
                 case RuntimePlatform.Android: targetPath = Application.persistentDataPath; break;
                 case RuntimePlatform.WindowsEditor: targetPath = Application.streamingAssetsPath; break;
+                case RuntimePlatform.WindowsPlayer: targetPath = Application.streamingAssetsPath; break;
                 case RuntimePlatform.LinuxPlayer:; break;
             }
-            Debug.Log("target path:" + targetPath);
+            logFromRecognizer("targetPath:" + targetPath);
             bool isOk = false;
             isOk = initDictionary(targetPath, language, grammars);
             if (isOk)
@@ -96,7 +116,6 @@ namespace MultiplatformSpeechRecognizerNamespace
             {
                 foreach (string word in grammar.words)
                 {
-                    //log.add("word:" + word);
                     if (!wordList.Contains(word))
                         wordList.Add(word);
                 }
@@ -119,8 +138,11 @@ namespace MultiplatformSpeechRecognizerNamespace
                 _speechRecognizer.partialRecognitionResult += resultReciever.getPartialResult;
         }
 
+        public BaseSpeechRecognizer.ReturnStringValue logFromRecognizer;
+
         public void setMessagesFromLogRecieverMethod(IGetLogMessages messagesReciever)
         {
+            logFromRecognizer += messagesReciever.getLogMessages;
             if (_speechRecognizer != null)
                 _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
         }

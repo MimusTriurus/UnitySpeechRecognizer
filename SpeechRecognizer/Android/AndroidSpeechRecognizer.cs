@@ -17,24 +17,24 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// <summary>
         /// метод-приёмник сообщений отладки из нативной android библиотеки SpeechRecognizer.jar
         /// </summary>
-        /// <param name="message"></param>
-        private void onCallbackLogFromJavaLib(string message)
+        /// <param name="pMessage"></param>
+        private void onCallbackLogFromJavaLib(string pMessage)
         {
             if (this.logFromRecognizer != null)
             {
-                this.logFromRecognizer.Invoke(message);
+                this.logFromRecognizer.Invoke(pMessage);
             }
         }
         /// <summary>
         /// метод-приёмник результатов инициализации SpeechRecognizer из нативной android библиотеки SpeechRecognizer.jar
         /// </summary>
-        /// <param name="message"></param>
-        private void onCallbackInitResultFromJavaLib(string message)
+        /// <param name="pMessage"></param>
+        private void onCallbackInitResultFromJavaLib(string pMessage)
         {
             _init = true;
             if (this.initializationResult != null)
             {
-                if (message == INIT_IS_OK)
+                if (pMessage == INIT_IS_OK)
                     this.initializationResult.Invoke(true); // исправить на фолс
                 else
                     this.initializationResult.Invoke(true);
@@ -43,30 +43,35 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// <summary>
         /// метод-приёмник промежуточных результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
         /// </summary>
-        /// <param name="message"></param>
-        private void onRecognitionPartialResult(string message)
+        /// <param name="pMessage"></param>
+        private void onRecognitionPartialResult(string pMessage)
         {
             if (this.partialRecognitionResult != null)
             {
-                this.partialRecognitionResult.Invoke(message);
+                this.partialRecognitionResult.Invoke(pMessage);
             }
         }
         /// <summary>
         /// метод-приёмник результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
         /// </summary>
-        /// <param name="message"></param>
-        private void onRecognitionResult(string message)
+        /// <param name="pMessage"></param>
+        private void onRecognitionResult(string pMessage)
         {
-            if (this.recognitionResult != null)
+            try
             {
-                this.recognitionResult.Invoke(message);
+                if (BaseSpeechRecognizer._instance != null)
+                    BaseSpeechRecognizer._instance.recognitionResult(pMessage);
+            }
+            catch (System.NullReferenceException e)
+            {
+                this.logFromRecognizer("error:" + e.Message);
             }
         }
 
-        public override void initialization(string language, GrammarFileStruct[] grammars)
+        public override void initialization(string pLanguage, GrammarFileStruct[] pGrammars)
         {
             this.logFromRecognizer.Invoke("start initialization");
-            this.getBaseGrammar(grammars);
+            this.getBaseGrammar(pGrammars);
 
             AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             if (unity == null)
@@ -91,14 +96,14 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
             #endregion
 
             string[] grammar = new string[2];
-            foreach (GrammarFileStruct gramm in grammars)
+            foreach (GrammarFileStruct gramm in pGrammars)
             {
                 grammar[0] = gramm.name;
                 grammar[1] = gramm.name + ".gram";
                 _recognizerActivity.Call(JavaWrapperMethodNames.ADD_GRAMMAR_FILE, grammar);
             }
             _recognizerActivity.Call(JavaWrapperMethodNames.SET_BASE_GRAMMAR_FILE, _baseGrammar);
-            _recognizerActivity.Call(JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP, language);
+            _recognizerActivity.Call(JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP, pLanguage);
         }
 
         public override void startListening()
@@ -117,9 +122,14 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
             }
         }
 
-        public override void switchGrammar(string grammarName)
+        public override void switchGrammar(string pGrammarName)
         {
-            _recognizerActivity.Call(JavaWrapperMethodNames.SWITCH_SEARCH, grammarName);
+            _recognizerActivity.Call(JavaWrapperMethodNames.SWITCH_SEARCH, pGrammarName);
+        }
+
+        void Awake()
+        {
+            BaseSpeechRecognizer._instance = this;
         }
     }
 }

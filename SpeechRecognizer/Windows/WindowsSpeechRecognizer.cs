@@ -5,48 +5,54 @@ using System.Collections;
 
 namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 {
+    /// <summary>
+    /// класс распознавания голоса для Windows x64
+    /// </summary>
     public class WindowsSpeechRecognizer : BaseSpeechRecognizer
     {
         private const string DLL_NAME = "SpeechRecognizer";
 
         #region связь с внешним миром
-        private void onCallbackLogFromLib(string message)
+        private void onCallbackLogFromLib(string pMessage)
         {
             if (this.logFromRecognizer != null)
             {
-                this.logFromRecognizer.Invoke(message);
+                this.logFromRecognizer.Invoke(pMessage);
             }
         }
 
-        private void onCallbackInitResultFromLib(string message)
+        private void onCallbackInitResultFromLib(string pMessage)
         {
             _init = true;
             
             if (this.initializationResult != null)
             {
-                if (message == INIT_IS_OK)
+                if (pMessage == INIT_IS_OK)
                     this.initializationResult.Invoke(true); // исправить на фолс
                 else
-                    this.logFromRecognizer(message);
+                    this.logFromRecognizer(pMessage);
             } 
         }
 
-        private void onRecognitionPartialResult(string message)
+        private void onRecognitionPartialResult(string pMessage)
         {
             if (this.partialRecognitionResult != null)
             {
-                this.partialRecognitionResult.Invoke(message);
+                this.partialRecognitionResult.Invoke(pMessage);
             }
         }
-        private void onRecognitionResult(string message)
+
+        private void onRecognitionResult(string pMessage)
         {
-            Debug.Log(message);
-            /*
-            if (this.recognitionResult != null)
+            try
             {
-                this.recognitionResult.Invoke(message);
+                if (BaseSpeechRecognizer._instance != null)
+                    BaseSpeechRecognizer._instance.recognitionResult(pMessage);
+            }
+            catch (System.NullReferenceException e)
+            {
+                this.logFromRecognizer("error:" + e.Message);
             }   
-            */ 
         }
         #endregion
         #region импортированные из библиотеки статические методы
@@ -109,7 +115,7 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
             setResultRecieverMethod(this.onRecognitionResult);
             setPartialResultRecieverMethod(this.onRecognitionPartialResult);
             setInitResultMethod(this.onCallbackInitResultFromLib);
-            saveLogIntoFile(true);
+            saveLogIntoFile(false);
 
             this.logFromRecognizer.Invoke("start initialization");
             this.getBaseGrammar(grammars);
@@ -142,6 +148,7 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         {
             changeGrammar(grammarName);
         }
+
         /// <summary>
         /// таймер-уведомление о том что пора читать буффер микрофона для распознавания
         /// </summary>
@@ -155,6 +162,11 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
                 readMicBuffer();
                 yield return new WaitForSeconds(interval);
             }
+        }
+
+        void Awake()
+        {
+            BaseSpeechRecognizer._instance = this;
         }
     }
 }
