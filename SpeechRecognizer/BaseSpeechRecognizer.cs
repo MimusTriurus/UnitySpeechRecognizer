@@ -6,7 +6,7 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
     /// <summary>
     /// базовый класс распознования голоса. От него наследуют классы WindowsSpeechRecognizer, AndroidSpeechRecognizer, LinuxSpeechRecognizer
     /// </summary>
-    public abstract class BaseSpeechRecognizer : MonoBehaviour
+    internal abstract class BaseSpeechRecognizer : MonoBehaviour
     {
         /// <summary>
         /// результат инициализации speechRecognizer
@@ -95,5 +95,63 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
             }
         }
         #endregion
+
+        /// <summary>
+        /// SpeechRecognizer из нативной android библиотеки
+        /// </summary>
+        protected AndroidJavaObject _recognizerActivity = null;
+        /// <summary>
+        /// метод-приёмник сообщений отладки из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="pMessage"></param>
+        protected void onCallbackLogFromLib(string pMessage)
+        {
+            if (BaseSpeechRecognizer._instance.logFromRecognizer != null)
+            {
+                BaseSpeechRecognizer._instance.logFromRecognizer(pMessage);
+            }
+        }
+        /// <summary>
+        /// метод-приёмник результатов инициализации SpeechRecognizer из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="pMessage"></param>
+        protected void onCallbackInitResultFromLib(string pMessage)
+        {
+            _init = true;
+            if (BaseSpeechRecognizer._instance.initializationResult != null)
+            {
+                if (pMessage == INIT_IS_OK)
+                    BaseSpeechRecognizer._instance.initializationResult(true); // исправить на фолс
+                else
+                    BaseSpeechRecognizer._instance.initializationResult(true);
+            }
+        }
+        /// <summary>
+        /// метод-приёмник промежуточных результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="pMessage"></param>
+        protected void onRecognitionPartialResult(string pMessage)
+        {
+            if (BaseSpeechRecognizer._instance.partialRecognitionResult != null)
+            {
+                BaseSpeechRecognizer._instance.partialRecognitionResult(pMessage);
+            }
+        }
+        /// <summary>
+        /// метод-приёмник результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
+        /// </summary>
+        /// <param name="pMessage"></param>
+        protected void onRecognitionResult(string pMessage)
+        {
+            try
+            {
+                if (BaseSpeechRecognizer._instance != null)
+                    BaseSpeechRecognizer._instance.recognitionResult(pMessage);
+            }
+            catch (System.NullReferenceException e)
+            {
+                this.logFromRecognizer("error:" + e.Message);
+            }
+        }
     }
 }

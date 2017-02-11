@@ -8,53 +8,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
     /// <summary>
     /// класс распознавания голоса для Windows x64
     /// </summary>
-    public class WindowsSpeechRecognizer : BaseSpeechRecognizer
+    internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
     {
         private const string DLL_NAME = "SpeechRecognizer";
 
-        #region связь с внешним миром
-        private void onCallbackLogFromLib(string pMessage)
-        {
-            if (this.logFromRecognizer != null)
-            {
-                this.logFromRecognizer.Invoke(pMessage);
-            }
-        }
-
-        private void onCallbackInitResultFromLib(string pMessage)
-        {
-            _init = true;
-            
-            if (this.initializationResult != null)
-            {
-                if (pMessage == INIT_IS_OK)
-                    this.initializationResult.Invoke(true); // исправить на фолс
-                else
-                    this.logFromRecognizer(pMessage);
-            } 
-        }
-
-        private void onRecognitionPartialResult(string pMessage)
-        {
-            if (this.partialRecognitionResult != null)
-            {
-                this.partialRecognitionResult.Invoke(pMessage);
-            }
-        }
-
-        private void onRecognitionResult(string pMessage)
-        {
-            try
-            {
-                if (BaseSpeechRecognizer._instance != null)
-                    BaseSpeechRecognizer._instance.recognitionResult(pMessage);
-            }
-            catch (System.NullReferenceException e)
-            {
-                this.logFromRecognizer("error:" + e.Message);
-            }   
-        }
-        #endregion
         #region импортированные из библиотеки статические методы
         [DllImport(DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void runRecognizerSetup([MarshalAs(UnmanagedType.LPStr)] string modelPath);

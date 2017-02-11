@@ -5,7 +5,7 @@ namespace GrammarNamespace
     /// <summary>
     /// инициализирует файлы грамматики
     /// </summary>
-    public class GrammarFilesCreator
+    internal class GrammarFilesCreator
     {
         /// <summary>
         /// директория в которой хранятся файлы грамматики

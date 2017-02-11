@@ -1,4 +1,6 @@
 E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.XML
 E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.dll
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Release\MultiplatformSpeechRecognizer.dll
-E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Release\MultiplatformSpeechRecognizer.csprojResolveAssemblyReference.cache
+E:\Projects\Unity3D\UnitySpeechRecognizer\MultiplatformSpeechRecognizer.dll
+E:\Projects\Unity3D\UnitySpeechRecognizer\MultiplatformSpeechRecognizer.XML
+E:\Projects\Unity3D\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechRecognizer.XML

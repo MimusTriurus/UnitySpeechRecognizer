@@ -8,66 +8,13 @@ using JavaWrapperMethodNamesNamespace;
 
 namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 {
-    public class AndroidSpeechRecognizer : BaseSpeechRecognizer
+    internal class AndroidSpeechRecognizer : BaseSpeechRecognizer
     {
         /// <summary>
         /// SpeechRecognizer из нативной android библиотеки
         /// </summary>
         private AndroidJavaObject _recognizerActivity = null;
-        /// <summary>
-        /// метод-приёмник сообщений отладки из нативной android библиотеки SpeechRecognizer.jar
-        /// </summary>
-        /// <param name="pMessage"></param>
-        private void onCallbackLogFromJavaLib(string pMessage)
-        {
-            if (this.logFromRecognizer != null)
-            {
-                this.logFromRecognizer.Invoke(pMessage);
-            }
-        }
-        /// <summary>
-        /// метод-приёмник результатов инициализации SpeechRecognizer из нативной android библиотеки SpeechRecognizer.jar
-        /// </summary>
-        /// <param name="pMessage"></param>
-        private void onCallbackInitResultFromJavaLib(string pMessage)
-        {
-            _init = true;
-            if (this.initializationResult != null)
-            {
-                if (pMessage == INIT_IS_OK)
-                    this.initializationResult.Invoke(true); // исправить на фолс
-                else
-                    this.initializationResult.Invoke(true);
-            }
-        }
-        /// <summary>
-        /// метод-приёмник промежуточных результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
-        /// </summary>
-        /// <param name="pMessage"></param>
-        private void onRecognitionPartialResult(string pMessage)
-        {
-            if (this.partialRecognitionResult != null)
-            {
-                this.partialRecognitionResult.Invoke(pMessage);
-            }
-        }
-        /// <summary>
-        /// метод-приёмник результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
-        /// </summary>
-        /// <param name="pMessage"></param>
-        private void onRecognitionResult(string pMessage)
-        {
-            try
-            {
-                if (BaseSpeechRecognizer._instance != null)
-                    BaseSpeechRecognizer._instance.recognitionResult(pMessage);
-            }
-            catch (System.NullReferenceException e)
-            {
-                this.logFromRecognizer("error:" + e.Message);
-            }
-        }
-
+ 
         public override void initialization(string pLanguage, GrammarFileStruct[] pGrammars)
         {
             this.logFromRecognizer.Invoke("start initialization");
@@ -89,10 +36,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 
             #region инициализируем колбэк из jar библиотеки
             _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_RECIEVER_OBJECT_NAME, this.gameObject.name);
-            _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_LOG_RECIEVER_METHOD_NAME, "onCallbackLogFromJavaLib");
+            _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_LOG_RECIEVER_METHOD_NAME, "onCallbackLogFromLib");
             _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_RECOGNITION_RESULT_RECIEVER_METHOD, "onRecognitionResult");
             _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_RECOGNITION_PARTIAL_RESULT_RECEIVER_METHOD, "onRecognitionPartialResult");
-            _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_INITIALIZATION_COMPLETE_METHOD, "onCallbackInitResultFromJavaLib");
+            _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_INITIALIZATION_COMPLETE_METHOD, "onCallbackInitResultFromLib");
             #endregion
 
             string[] grammar = new string[2];

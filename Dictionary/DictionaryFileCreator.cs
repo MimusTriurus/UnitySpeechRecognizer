@@ -8,7 +8,7 @@ namespace DictionaryNamespace
     /// <summary>
     /// инициализирует актуальный словарь
     /// </summary>
-    public class DictionaryFileCreator
+    internal class DictionaryFileCreator
     {
         /// <summary>
         /// директория в которой хранятся словари

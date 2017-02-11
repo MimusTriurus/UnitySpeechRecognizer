@@ -7,6 +7,9 @@ using DictionaryNamespace;
 
 namespace MultiplatformSpeechRecognizerNamespace
 {
+    /// <summary>
+    /// Обёртка для распознавания голоса под различные платформы
+    /// </summary>
     public class MultiplatformSpeechRecognizer
     {
         private BaseSpeechRecognizer _speechRecognizer = null;
@@ -14,35 +17,40 @@ namespace MultiplatformSpeechRecognizerNamespace
         /// <summary>
         /// конструктор
         /// </summary>
-        /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
-        public MultiplatformSpeechRecognizer(MonoBehaviour parent)
+        /// <param name="pParent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
+        public MultiplatformSpeechRecognizer(MonoBehaviour pParent)
         {
             switch (Application.platform)
             {
-                case RuntimePlatform.Android: parent.gameObject.AddComponent<AndroidSpeechRecognizer>(); break;
-                case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
-                case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
+                case RuntimePlatform.Android: pParent.gameObject.AddComponent<AndroidSpeechRecognizer>(); break;
+                case RuntimePlatform.WindowsEditor: pParent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
+                case RuntimePlatform.WindowsPlayer: pParent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
                 case RuntimePlatform.LinuxPlayer:; break;
             }
-            _speechRecognizer = parent.GetComponent<BaseSpeechRecognizer>();
+            _speechRecognizer = pParent.GetComponent<BaseSpeechRecognizer>();
             if (_speechRecognizer == null)
             {
-                //toLog("empty component");
+                Debug.Log("empty component speechRecognizer");
                 return;
             }
         }
 
         #region инициализация
-        public void init(string language, GrammarFileStruct[] grammars)
+        /// <summary>
+        /// инициализация платформозависимого распознавателя голоса 
+        /// </summary>
+        /// <param name="pLanguage">язык - для выбора директории с языковой моделью и словарём</param>
+        /// <param name="pGrammars">массив грамматик со словами</param>
+        public void init(string pLanguage, GrammarFileStruct[] pGrammars)
         {
             if (_speechRecognizer == null)
             {
-                logFromRecognizer("speech is empty");
+                Debug.Log("speech is empty");
                 return;
             }
                 
             // все слова в нижний регистр
-            foreach (GrammarFileStruct grammar in grammars)
+            foreach (GrammarFileStruct grammar in pGrammars)
             {
                 for (int i = 0; i < grammar.words.Length; i++)
                 {
@@ -50,22 +58,21 @@ namespace MultiplatformSpeechRecognizerNamespace
                 }
             }
 
-            bool isOk = initFileSystem(language, grammars);
+            bool isOk = initFileSystem(pLanguage, pGrammars);
             if (isOk)
-                initSpeechRecognizer(language, grammars);
+                initSpeechRecognizer(pLanguage, pGrammars);
             else
             {
-                logFromRecognizer("error on init file system");
                 Debug.Log("error on init file system");
             }
         }
         /// <summary>
         /// формируем иерархию папок, актуальный словарь и файлы грамматики на основании массива структур грамматики
         /// </summary>
-        /// <param name="language">целевой язык</param>
-        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <param name="pLanguage">целевой язык</param>
+        /// <param name="pGrammars">массив структур грамматики(имя грамматики, массив слов)</param>
         /// <returns></returns>
-        private bool initFileSystem(string language, GrammarFileStruct[] grammars)
+        private bool initFileSystem(string pLanguage, GrammarFileStruct[] pGrammars)
         {
             string targetPath = string.Empty;
             switch (Application.platform)
@@ -75,44 +82,43 @@ namespace MultiplatformSpeechRecognizerNamespace
                 case RuntimePlatform.WindowsPlayer: targetPath = Application.streamingAssetsPath; break;
                 case RuntimePlatform.LinuxPlayer:; break;
             }
-            logFromRecognizer("targetPath:" + targetPath);
             bool isOk = false;
-            isOk = initDictionary(targetPath, language, grammars);
+            isOk = initDictionary(targetPath, pLanguage, pGrammars);
             if (isOk)
             {
-                initGrammarFiles(targetPath, language, grammars);
+                initGrammarFiles(targetPath, pLanguage, pGrammars);
             }
             return isOk;
         }
 
-        private void initSpeechRecognizer(string language, GrammarFileStruct[] grammars)
+        private void initSpeechRecognizer(string pLanguage, GrammarFileStruct[] pGrammars)
         {
-            _speechRecognizer.initialization(language, grammars);
+            _speechRecognizer.initialization(pLanguage, pGrammars);
         }
         /// <summary>
         /// создаём файлы грамматики
         /// </summary>
-        /// <param name="targetPath">целевая директория куда будут скопированы файлы грамматики</param>
-        /// <param name="language">целевой язык(базовая дирректория)</param>
-        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
-        private void initGrammarFiles(string targetPath, string language, GrammarFileStruct[] grammars)
+        /// <param name="pTargetPath">целевая директория куда будут скопированы файлы грамматики</param>
+        /// <param name="pLanguage">целевой язык(базовая дирректория)</param>
+        /// <param name="pGrammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        private void initGrammarFiles(string pTargetPath, string pLanguage, GrammarFileStruct[] pGrammars)
         {
-            GrammarFilesCreator grammarFileCreator = new GrammarFilesCreator(targetPath, language);
-            grammarFileCreator.createGrammarFiles(grammars);
+            GrammarFilesCreator grammarFileCreator = new GrammarFilesCreator(pTargetPath, pLanguage);
+            grammarFileCreator.createGrammarFiles(pGrammars);
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="targetPath">целевая директория куда будут скопирован актуальный словарь</param>
-        /// <param name="language">целевой язык(базовая дирректория)</param>
-        /// <param name="grammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <param name="pTargetPath">целевая директория куда будут скопирован актуальный словарь</param>
+        /// <param name="pLanguage">целевой язык(базовая дирректория)</param>
+        /// <param name="pGrammars">массив структур грамматики(имя грамматики, массив слов)</param>
         /// <returns></returns>
-        private bool initDictionary(string targetPath, string language, GrammarFileStruct[] grammars)
+        private bool initDictionary(string pTargetPath, string pLanguage, GrammarFileStruct[] pGrammars)
         {
             string sourcePath = Application.streamingAssetsPath;
-            DictionaryFileCreator dict = new DictionaryFileCreator(sourcePath, targetPath, language);
+            DictionaryFileCreator dict = new DictionaryFileCreator(sourcePath, pTargetPath, pLanguage);
             List<string> wordList = new List<string>();
-            foreach (GrammarFileStruct grammar in grammars)
+            foreach (GrammarFileStruct grammar in pGrammars)
             {
                 foreach (string word in grammar.words)
                 {
@@ -126,50 +132,67 @@ namespace MultiplatformSpeechRecognizerNamespace
         #endregion
 
         #region определяем методы-приёмники результатов работы библиотеки распознавания
-        public void setResultRecieverMethod(IGetResult resultReciever)
+        /// <summary>
+        /// устанавливает связь сигнала со слотом получения результатов распознавания
+        /// </summary>
+        /// <param name="pResultReciever">интерфейсная ссылка на объект приёмник</param>
+        public void setResultRecieverMethod(IGetResult pResultReciever)
         {
             if (_speechRecognizer != null)
-                _speechRecognizer.recognitionResult += resultReciever.getResult;
+                _speechRecognizer.recognitionResult += pResultReciever.getResult;
         }
-
-        public void setPartialResultRecieverMethod(IGetPartialResult resultReciever)
+        /// <summary>
+        /// устанавливает связь сигнала со слотом получения промежуточных результатов распознавания
+        /// </summary>
+        /// <param name="pResultReciever">интерфейсная ссылка на объект приёмник</param>
+        public void setPartialResultRecieverMethod(IGetPartialResult pResultReciever)
         {
             if (_speechRecognizer != null)
-                _speechRecognizer.partialRecognitionResult += resultReciever.getPartialResult;
+                _speechRecognizer.partialRecognitionResult += pResultReciever.getPartialResult;
         }
-
-        public BaseSpeechRecognizer.ReturnStringValue logFromRecognizer;
-
-        public void setMessagesFromLogRecieverMethod(IGetLogMessages messagesReciever)
+        /// <summary>
+        /// устанавливает связь сигнала со слотом получения сообщений для вывода в лог
+        /// </summary>
+        /// <param name="pMessagesReciever">интерфейсная ссылка на объект приёмник</param>
+        public void setMessagesFromLogRecieverMethod(IGetLogMessages pMessagesReciever)
         {
-            logFromRecognizer += messagesReciever.getLogMessages;
             if (_speechRecognizer != null)
-                _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
+                _speechRecognizer.logFromRecognizer += pMessagesReciever.getLogMessages;
         }
-
-        public void setInitResultMethod(IGetSpeechRecognizerInitResult resultReciever)
+        /// <summary>
+        /// устанавливает связь сигнала со слотом получения результатов инициализации распознавателя голоса в соответствующей библиотеке
+        /// </summary>
+        /// <param name="pResultReciever"></param>
+        public void setInitResultMethod(IGetSpeechRecognizerInitResult pResultReciever)
         {
             if (_speechRecognizer != null)
-                _speechRecognizer.initializationResult += resultReciever.getSpeechRecognizerInitResult;
+                _speechRecognizer.initializationResult += pResultReciever.getSpeechRecognizerInitResult;
         }
         #endregion
-
+        /// <summary>
+        /// микрофон на запись - начало распознавания
+        /// </summary>
         public void startListening()
         {
             if (_speechRecognizer != null)
                 _speechRecognizer.startListening();
         }
-
+        /// <summary>
+        /// отключение микрофона - конец распознавания
+        /// </summary>
         public void stopListening()
         {
             if (_speechRecognizer != null)
                 _speechRecognizer.stopListening();
         }
-
-        public void switchGrammar(string grammarName)
+        /// <summary>
+        /// меняем грамматику.меняем набор слов доступных для распознавания
+        /// </summary>
+        /// <param name="pGrammarName">имя грамматики</param>
+        public void switchGrammar(string pGrammarName)
         {
             if (_speechRecognizer != null)
-                _speechRecognizer.switchGrammar(grammarName);
+                _speechRecognizer.switchGrammar(pGrammarName);
         }
     }
 }
