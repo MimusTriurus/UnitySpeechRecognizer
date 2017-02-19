@@ -26,7 +26,7 @@ namespace DictionaryNamespace
         /// <summary>
         /// имя актуального словаря
         /// </summary>
-        private const string ACTUAL_DICTIONARY_NAME = "actualDictionary";
+        private const string ACTUAL_DICTIONARY_NAME = "actualDictionary1";
         /// <summary>
         /// расширение файла словаря
         /// </summary>
@@ -143,5 +143,7 @@ namespace DictionaryNamespace
 
             file.Close();
         }
+
+
     }
 }

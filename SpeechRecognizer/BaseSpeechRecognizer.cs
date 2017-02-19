@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using GrammarNamespace;
+
+using System.Linq;
+using System.Reflection;
+using System.Resources;
 
 namespace MultiplatformSpeechRecognizer.SpeechRecognizer
 {
@@ -8,6 +13,20 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
     /// </summary>
     internal abstract class BaseSpeechRecognizer : MonoBehaviour
     {
+        protected const string ERROR_ON_INIT = "crash on init ";
+        protected const string ERROR_ON_ADD_GRAMMAR = "crash on add grammar ";
+        protected const string ERROR_ON_ADD_WORD = "crash on add word into dictionary ";
+        protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
+        protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
+
+        protected abstract void setKeywordThreshold(double pValue = 1e+10f);
+        /// <summary>
+        /// порог срабатывания при распознавании ключевого слова
+        /// </summary>
+        public double keywordThreshold
+        {
+            set { setKeywordThreshold(value); }
+        }
         /// <summary>
         /// результат инициализации speechRecognizer
         /// </summary>
@@ -39,6 +58,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// </summary>
         public ReturnStringValue logFromRecognizer;
         /// <summary>
+        /// сигнал с сообщением об ошибке
+        /// </summary>
+        public ReturnStringValue errorMessage;
+        /// <summary>
         /// сигнал с промежуточным результатом распознавания
         /// </summary>
         public ReturnStringValue partialRecognitionResult;
@@ -66,9 +89,10 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// <summary>
         /// инициализируем распознаватель голоса
         /// </summary>
-        /// <param name="language">язык - определяет дирректорию с акустической моделью, словарями и файлами граматики</param>
-        /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
-        public abstract void initialization(string language, GrammarFileStruct[] grammars);
+        /// <param name="pLanguage">язык - определяет дирректорию с акустической моделью, словарями и файлами граматики</param>
+        /// <param name="pGrammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
+        /// <param name="pKeyword">ключевое слово</param>
+        public abstract void initialization(string pLanguage = "", GrammarFileStruct[] pGrammars = null, string pKeyword = "");
 
         #region baseGrammar
         /// <summary>
@@ -117,13 +141,19 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// <param name="pMessage"></param>
         protected void onCallbackInitResultFromLib(string pMessage)
         {
-            _init = true;
+            
             if (BaseSpeechRecognizer._instance.initializationResult != null)
             {
                 if (pMessage == INIT_IS_OK)
+                {
                     BaseSpeechRecognizer._instance.initializationResult(true); // исправить на фолс
+                    _init = true;
+                }
                 else
+                {
                     BaseSpeechRecognizer._instance.initializationResult(true);
+                    _init = false;
+                }
             }
         }
         /// <summary>
@@ -152,6 +182,87 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
             {
                 this.logFromRecognizer("error:" + e.Message);
             }
+        }
+        /// <summary>
+        /// получаем актуальный словарь
+        /// </summary>
+        /// <param name="pLanguage">язык словаря</param>
+        /// <param name="pGrammars">список слов для внесения в словарь</param>
+        /// <param name="pKeyword">ключевое слово</param>
+        /// <returns>актуальный словарь (слово, транскрипция)</returns>
+        protected Dictionary<string, string> getWordsPhones(string pLanguage = "", GrammarFileStruct[] pGrammars = null, string pKeyword = "")
+        {
+            if (pLanguage != string.Empty)
+            {
+                string dictName = string.Empty;
+                switch (pLanguage)
+                {
+                    case "eng": dictName = "EngDictionary"; break;
+                    case "esp": dictName = "EspDictionary"; break;
+                    case "fr": dictName = "FrDictionary"; break;
+                    case "ger": dictName = "GerDictionary"; break;
+                    case "it": dictName = "ItDictionary"; break;
+                    case "ru": dictName = "RuDictionary"; break;
+                }
+                if (dictName != string.Empty)
+                {
+                    Dictionary<string, string> baseDict = readDictionaryFromResources(dictName);
+                    if (baseDict == null) Debug.Log("getWordsPhones empty dict"); else Debug.Log("getWordsPhones dict");
+                    return getActualDictionary(ref baseDict, pGrammars, pKeyword);
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+        /// <summary>
+        /// считывание полного(базового) словаря из ресурсов
+        /// </summary>
+        /// <param name="pDictName">имя словаря</param>
+        /// <returns>словарь (слово, транскрипция)</returns>
+        private Dictionary<string, string> readDictionaryFromResources(string pDictName)
+        {
+            ResourceManager rm = new ResourceManager("MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly());
+            if (rm != null)
+            {
+                string dataText = rm.GetString(pDictName);
+                Dictionary<string, string> transriptionContainer = dataText.TrimEnd('\n').Split('\n').ToDictionary(item => item.Split(' ')[0], item => item.Remove(0, item.IndexOf(" ") + 1));
+                return transriptionContainer;
+            }
+            else
+                return null;
+        }
+        /// <summary>
+        /// формируем актуальный словарь
+        /// </summary>
+        /// <param name="pDict">полный(базовый) словарь </param>
+        /// <param name="pGrammars">слова для внесения в актуальный словарь</param>
+        /// <param name="pKeyword">ключевое слово</param>
+        /// <returns>актуальный словарь со словами из GrammarFileStruct</returns>
+        private Dictionary<string, string> getActualDictionary(ref Dictionary<string, string> pDict, GrammarFileStruct[] pGrammars = null, string pKeyword = "")
+        {
+            Dictionary<string, string> actualDict = new Dictionary<string, string>();
+            foreach (GrammarFileStruct grammar in pGrammars)
+            {
+                foreach (string word in grammar.words)
+                {
+                    if (pDict.ContainsKey(word))
+                    {
+                        actualDict.Add(word, pDict[word]);
+                        Debug.Log("add word:" + word + " phones:" + pDict[word]);
+                    }
+                    else
+                        this.errorMessage("word [" + word + "] not found");
+                }
+            }
+
+            if (pDict.ContainsKey(pKeyword))
+                actualDict.Add(pKeyword, pDict[pKeyword]);
+            else
+                this.errorMessage("keyword [" + pKeyword + "] not found");
+
+            return actualDict;
         }
     }
 }

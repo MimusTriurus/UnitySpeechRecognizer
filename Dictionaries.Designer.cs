@@ -59,5 +59,213 @@ namespace MultiplatformSpeechRecognizer {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;bout B AW T
+        ///&apos;cause K AH Z
+        ///&apos;course K AO R S
+        ///&apos;cuse K Y UW Z
+        ///&apos;em AH M
+        ///&apos;frisco F R IH S K OW
+        ///&apos;gain G EH N
+        ///&apos;kay K EY
+        ///&apos;m AH M
+        ///&apos;n AH N
+        ///&apos;round R AW N D
+        ///&apos;s EH S
+        ///&apos;til T IH L
+        ///&apos;tis T IH Z
+        ///&apos;twas T W AH Z
+        ///a AH
+        ///a&apos;s EY Z
+        ///a(2) EY
+        ///a. EY
+        ///a.&apos;s EY Z
+        ///a.s EY Z
+        ///aaa T R IH P AH L EY
+        ///aaberg AA B ER G
+        ///aachen AA K AH N
+        ///aachener AA K AH N ER
+        ///aaker AA K ER
+        ///aalseth AA L S EH TH
+        ///aamodt AA M AH T
+        ///aancor AA N K AO R
+        ///aardema AA R D EH M AH
+        ///aardvark AA R D V AA R K
+        ///aargh AA R G
+        ///aaron EH R AH N
+        ///aaron&apos;s EH R AH N Z
+        ///aarons EH R AH N Z
+        ///aaronson  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EngDictionary {
+            get {
+                return ResourceManager.GetString("EngDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a a
+        ///aaron a a r o n
+        ///ab a b
+        ///abajo a b a j o
+        ///abandona a b a n d o n a
+        ///abandonada a b a n d o n a d a
+        ///abandonadas a b a n d o n a d a s
+        ///abandonado a b a n d o n a d o
+        ///abandonados a b a n d o n a d o s
+        ///abandonan a b a n d o n a n
+        ///abandonar a b a n d o n a r
+        ///abandonara a b a n d o n a r a
+        ///abandonarla a b a n d o n a r l a
+        ///abandonaron a b a n d o n a r o n
+        ///abandonará a b a n d o n a r a 
+        ///abandone a b a n d o n e
+        ///abandonen a b a n d o n e n
+        ///abandono a b a n d o n o
+        ///abandonó a b a n d o n o 
+        ///abanico a b a n i k o
+        ///a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EspDictionary {
+            get {
+                return ResourceManager.GetString("EspDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -ce ss
+        ///-ce(2) ss ee
+        ///-ci ss ii
+        ///-elle ai ll
+        ///-elle(2) ai ll ee
+        ///-elle(3) tt ai ll
+        ///-elle(4) tt ai ll ee
+        ///-elles ai ll
+        ///-elles(2) ai ll ee
+        ///-elles(3) ai ll ee zz
+        ///-elles(4) ai ll zz
+        ///-elles(5) tt ai ll
+        ///-elles(6) tt ai ll ee
+        ///-en an
+        ///-en(2) an nn
+        ///-en(3) zz an
+        ///-il ii ll
+        ///-il(2) tt ii ll
+        ///-ils ii ll
+        ///-ils(2) ii ll zz
+        ///-ils(3) tt ii ll
+        ///-je jj
+        ///-je(2) jj ee
+        ///-la ll aa
+        ///-le ll
+        ///-le(2) ll ee
+        ///-les ll ai
+        ///-les(2) ll ai zz
+        ///-les(3) ll ei
+        ///-les(4) ll ei zz
+        ///-lui ll uy ii
+        ///-là ll aa
+        ///-moi mm ww aa
+        ///-même mm ai mm
+        ///-même(2) mm ai mm ee
+        ///-mêmes mm ai [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FrDictionary {
+            get {
+                return ResourceManager.GetString("FrDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A AAH
+        ///A(2) Q EE IH
+        ///À AH
+        ///AACHEN Q AAH X AX N
+        ///AAR AAH EX
+        ///AB Q AH P
+        ///ABART Q AH P Q AH EX T
+        ///ABARTEN Q AH P Q AH EX T AX N
+        ///ABBAU Q AH P B AW
+        ///ABBAUEN Q AH P B AW AX N
+        ///ABBEDINGUNG Q AH P B AX D IH NG UU NG
+        ///ABBERUFEN Q AH P B AX RR UUH F AX N
+        ///ABBILD Q AH P B IH L T
+        ///ABBILDUNG Q AH P B IH L D UU NG
+        ///ABBILDUNGEN Q AH P B IH L D UU NG AX N
+        ///ABBOT AH B OOH T
+        ///ABBOTS Q AH P B AO TS
+        ///ABBRUCH Q AH P B RR UU X
+        ///ABBRÜCHE Q AH P B RR YY CC AX
+        ///ABDRÜCKEN Q AH P D RR YY K AX N
+        ///ABEND Q AAH B AX N T
+        ///ABENDBROT Q AAH B AX N T B RR OOH T
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GerDictionary {
+            get {
+                return ResourceManager.GetString("GerDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a a1
+        ///a&apos; a1 
+        ///abandona a b a n d o1 n a 
+        ///abandonai a b a n d o n a1 i 
+        ///abandonammo a b a n d o n a1 m m o 
+        ///abandonando a b a n d o n a1 n d o
+        ///abandonare a b a n d o n a1 r e
+        ///abandonaste a b a n d o n a1 s t e 
+        ///abandonata a b a n d o n a1 t a
+        ///abandonate a b a n d o n a1 t e
+        ///abandonati a b a n d o n a1 t i
+        ///abandonato a b a n d o n a1 t o
+        ///abandonava a b a n d o n a1 v a 
+        ///abandonino a b a n d o1 n i n o 
+        ///abastanza a b a s t a1 n ts a 
+        ///abate a b a1 t e
+        ///abbaglia a b b a1 LL LL a 
+        ///abbagliamento a b b a LL LL a m e1  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ItDictionary {
+            get {
+                return ResourceManager.GetString("ItDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to а a1
+        ///а(2) a0
+        ///а-их-ма-хма a1 i1 h m a1 h m a1
+        ///а-их-ма-хма(2) a0 i1 h m a1 h m a1
+        ///а-ля a1 lj a1
+        ///а-ля(2) a0 lj a1
+        ///а-ля-бальзак a1 lj a1 b a0 lj z a1 k
+        ///а-ха-ха a1 h a1 h a1
+        ///аа a1
+        ///аадниель a0 a0 d nj i0 j e1 lj
+        ///аадниэль a1 a0 d nj i0 e0 lj
+        ///ааз a1 a0 z
+        ///ааза a0 a0 z a1
+        ///аазом a0 a0 z o1 m
+        ///аазу a0 a0 z u1
+        ///аака a0 a0 k a1
+        ///аали a0 a0 lj i1
+        ///аалтонен a1 a0 l t o0 nj e0 n
+        ///аальмар a1 a0 lj m a0 r
+        ///аар a1 a0 r
+        ///ааре a0 a0 rj e1
+        ///ааренисе a0 a0 rj e1 nj i0 sj e0
+        ///аарне a1 a0 r nj e0
+        ///аарон a0 a0 r o1 n
+        ///аарона a0 a0 r o0 n a1
+        ///аар [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string RuDictionary {
+            get {
+                return ResourceManager.GetString("RuDictionary", resourceCulture);
+            }
+        }
     }
 }

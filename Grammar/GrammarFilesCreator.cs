@@ -81,7 +81,7 @@ namespace GrammarNamespace
         {
             foreach (GrammarFileStruct grammarFile in grammarFilesStruct)
             {
-                initNewGrammarFile(grammarFile.name, grammarFile.words);
+                //initNewGrammarFile(grammarFile.name, grammarFile.words);
             }
         }
 

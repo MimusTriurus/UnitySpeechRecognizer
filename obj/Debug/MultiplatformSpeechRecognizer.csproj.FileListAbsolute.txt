@@ -3,7 +3,10 @@ E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\MultiplatformSpeechR
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\UnityEngine.dll
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\bin\Debug\UnityEngine.xml
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.dll
-E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.pdb
 E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.dll
-E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.pdb
+E:\Projects\Unity3D\JavaTestWrapper\Assets\Plugins\MultiplatformSpeechRecognizer.XML
+E:\Projects\Unity3D\UnitySpeechRecognizer\Assets\Plugins\.xml
+E:\Projects\Unity3D\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechRecognizer.dll
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.csprojResolveAssemblyReference.cache
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.Dictionaries.resources
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.csproj.GenerateResource.Cache

@@ -1,19 +1,34 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using MultiplatformSpeechRecognizer.SpeechRecognizer;
-using MultiplatformSpeechRecognizer.Interfaces;
+using MultiplatformSpeechRecognizerNamespace.Interfaces;
 using GrammarNamespace;
 using DictionaryNamespace;
 
+using System.Linq;
+using System.Reflection;
+using System.Resources;
+
 namespace MultiplatformSpeechRecognizerNamespace
 {
+    /// <summary>
+    /// доступные языковые модели
+    /// </summary>
+    public enum Language
+    {
+        eng,
+        ru,
+        ger,
+        esp,
+        fr,
+        it
+    }
     /// <summary>
     /// Обёртка для распознавания голоса под различные платформы
     /// </summary>
     public class MultiplatformSpeechRecognizer
     {
         private BaseSpeechRecognizer _speechRecognizer = null;
-
         /// <summary>
         /// конструктор
         /// </summary>
@@ -41,14 +56,17 @@ namespace MultiplatformSpeechRecognizerNamespace
         /// </summary>
         /// <param name="pLanguage">язык - для выбора директории с языковой моделью и словарём</param>
         /// <param name="pGrammars">массив грамматик со словами</param>
-        public void init(string pLanguage, GrammarFileStruct[] pGrammars)
+        /// <param name="pKeyword">ключевое слово инициирующее поиск (ok google)</param>
+        /// <param name="pThreshold">порог срабатывания ключеового слова</param>
+        public void init(Language pLanguage = Language.eng, GrammarFileStruct[] pGrammars = null, string pKeyword = "", double pThreshold = 1e+10f)
         {
+            //readDictionaryFromResources("");
             if (_speechRecognizer == null)
-            {
-                Debug.Log("speech is empty");
                 return;
-            }
-                
+            if (pGrammars == null)
+                return;
+            if (pGrammars.Length == 0)
+                return;
             // все слова в нижний регистр
             foreach (GrammarFileStruct grammar in pGrammars)
             {
@@ -57,22 +75,41 @@ namespace MultiplatformSpeechRecognizerNamespace
                     grammar.words[i] = grammar.words[i].ToLower();
                 }
             }
-
-            bool isOk = initFileSystem(pLanguage, pGrammars);
+            _speechRecognizer.keywordThreshold = pThreshold;
+            bool isOk = initFileSystem(pLanguage.ToString(), pGrammars, pKeyword.ToLower());
             if (isOk)
-                initSpeechRecognizer(pLanguage, pGrammars);
+                initSpeechRecognizer(pLanguage.ToString(), pGrammars, pKeyword.ToLower());
             else
             {
                 Debug.Log("error on init file system");
             }
         }
+
+        private void readDictionaryFromResources(string language)
+        {
+            ResourceManager rm = new ResourceManager("MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly());
+            if (rm != null)
+            {
+                //rm.GetObject("EngDictionary");
+                //resources.GetStream("EngDictionary");
+
+                string dataText = rm.GetString("EngDictionary");
+                Dictionary<string, string> transriptionContainer = dataText.TrimEnd('\n').Split('\n').ToDictionary(item => item.Split(' ')[0], item => item.ToString());
+                log.getLogMessages("word count:" + transriptionContainer.Count);
+                log.getLogMessages("found resources");
+            }
+            else
+                log.getLogMessages("no found resources");
+        }
+
         /// <summary>
         /// формируем иерархию папок, актуальный словарь и файлы грамматики на основании массива структур грамматики
         /// </summary>
         /// <param name="pLanguage">целевой язык</param>
         /// <param name="pGrammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <param name="pKeyword">ключевое слово инициирующее поиск (ok google)</param>
         /// <returns></returns>
-        private bool initFileSystem(string pLanguage, GrammarFileStruct[] pGrammars)
+        private bool initFileSystem(string pLanguage, GrammarFileStruct[] pGrammars, string pKeyword = "")
         {
             string targetPath = string.Empty;
             switch (Application.platform)
@@ -83,7 +120,7 @@ namespace MultiplatformSpeechRecognizerNamespace
                 case RuntimePlatform.LinuxPlayer:; break;
             }
             bool isOk = false;
-            isOk = initDictionary(targetPath, pLanguage, pGrammars);
+            isOk = initDictionary(targetPath, pLanguage, pGrammars, pKeyword);
             if (isOk)
             {
                 initGrammarFiles(targetPath, pLanguage, pGrammars);
@@ -91,9 +128,9 @@ namespace MultiplatformSpeechRecognizerNamespace
             return isOk;
         }
 
-        private void initSpeechRecognizer(string pLanguage, GrammarFileStruct[] pGrammars)
+        private void initSpeechRecognizer(string pLanguage, GrammarFileStruct[] pGrammars, string pKeyword = "")
         {
-            _speechRecognizer.initialization(pLanguage, pGrammars);
+            _speechRecognizer.initialization(pLanguage, pGrammars, pKeyword);
         }
         /// <summary>
         /// создаём файлы грамматики
@@ -112,8 +149,9 @@ namespace MultiplatformSpeechRecognizerNamespace
         /// <param name="pTargetPath">целевая директория куда будут скопирован актуальный словарь</param>
         /// <param name="pLanguage">целевой язык(базовая дирректория)</param>
         /// <param name="pGrammars">массив структур грамматики(имя грамматики, массив слов)</param>
+        /// <param name="pKeyword">ключевое слово инициирующее поиск (ok google)</param>
         /// <returns></returns>
-        private bool initDictionary(string pTargetPath, string pLanguage, GrammarFileStruct[] pGrammars)
+        private bool initDictionary(string pTargetPath, string pLanguage, GrammarFileStruct[] pGrammars, string pKeyword = "")
         {
             string sourcePath = Application.streamingAssetsPath;
             DictionaryFileCreator dict = new DictionaryFileCreator(sourcePath, pTargetPath, pLanguage);
@@ -126,6 +164,8 @@ namespace MultiplatformSpeechRecognizerNamespace
                         wordList.Add(word);
                 }
             }
+            if (pKeyword != string.Empty)
+                wordList.Add(pKeyword);
             dict.initDictionary(wordList);
             return dict.isOK;
         }
@@ -156,9 +196,21 @@ namespace MultiplatformSpeechRecognizerNamespace
         /// <param name="pMessagesReciever">интерфейсная ссылка на объект приёмник</param>
         public void setMessagesFromLogRecieverMethod(IGetLogMessages pMessagesReciever)
         {
+            log = pMessagesReciever;// удалить
             if (_speechRecognizer != null)
                 _speechRecognizer.logFromRecognizer += pMessagesReciever.getLogMessages;
         }
+        IGetLogMessages log = null; // удалить
+        /// <summary>
+        ///  устанавливает связь сигнала со слотом получения сообщений об ошибках для вывода в лог
+        /// </summary>
+        /// <param name="pCrashMessReciever">интерфейсная ссылка на объект приёмник</param>
+        public void setCrashMessagesRecieverMethod(IGetCrashMessages pCrashMessReciever)
+        {
+            if (_speechRecognizer != null)
+                _speechRecognizer.errorMessage += pCrashMessReciever.getCrashMessages;
+        }
+
         /// <summary>
         /// устанавливает связь сигнала со слотом получения результатов инициализации распознавателя голоса в соответствующей библиотеке
         /// </summary>

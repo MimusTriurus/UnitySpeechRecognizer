@@ -15,7 +15,7 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         /// </summary>
         private AndroidJavaObject _recognizerActivity = null;
  
-        public override void initialization(string pLanguage, GrammarFileStruct[] pGrammars)
+        public override void initialization(string pLanguage = "", GrammarFileStruct[] pGrammars = null, string pKeyword = "")
         {
             this.logFromRecognizer.Invoke("start initialization");
             this.getBaseGrammar(pGrammars);
@@ -72,6 +72,11 @@ namespace MultiplatformSpeechRecognizer.SpeechRecognizer
         public override void switchGrammar(string pGrammarName)
         {
             _recognizerActivity.Call(JavaWrapperMethodNames.SWITCH_SEARCH, pGrammarName);
+        }
+
+        protected override void setKeywordThreshold(double pValue = 10000000000)
+        {
+            
         }
 
         void Awake()
