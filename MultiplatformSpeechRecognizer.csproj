@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>E:\Projects\Unity3D\UnitySpeechRecognizer\Assets\Plugins\.xml</DocumentationFile>
+    <DocumentationFile>..\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechRecognizer.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -53,11 +53,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Dictionaries.resx</DependentUpon>
     </Compile>
-    <Compile Include="Dictionary\DictionaryFileCreator.cs" />
-    <Compile Include="Grammar\GrammarFilesCreator.cs" />
     <Compile Include="Grammar\GrammarFileStruct.cs" />
     <Compile Include="Interfaces\IGetLogMessages.cs" />
-    <Compile Include="Interfaces\IGetPartialResult.cs" />
     <Compile Include="Interfaces\IGetResult.cs" />
     <Compile Include="Interfaces\IGetSpeechRecognizerInitResult.cs" />
     <Compile Include="Interfaces\IGetCrashMessages.cs" />

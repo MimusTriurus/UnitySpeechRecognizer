@@ -58,5 +58,25 @@ namespace JavaWrapperMethodNamesNamespace
         /// прекращает распознавание 
         /// </summary>
         public const string STOP_LISTENING = "stopListening";
+        /// <summary>
+        /// добавление слова в словарь
+        /// </summary>
+        public const string ADD_WORD_INTO_DICTIONARY = "addWordIntoDictionary";
+        /// <summary>
+        /// добавляем формализованную строку с грамматикой
+        /// </summary>
+        public const string ADD_GRAMMAR_STRING = "addGrammarString";
+        /// <summary>
+        /// устанавливаем ключевое слово
+        /// </summary>
+        public const string SET_KEYWORD = "setKeyword";
+        /// <summary>
+        /// инициируем поиск ключевого слова
+        /// </summary>
+        public const string SET_SEARCH_KEYWORD = "setSearchKeyword";
+        /// <summary>
+        /// устанавливаем порог срабатывания для ключевого слова
+        /// </summary>
+        public const string SET_THRESHOLD = "setThreshold";
     }
 }

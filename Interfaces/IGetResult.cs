@@ -1,7 +1,4 @@
-﻿namespace MultiplatformSpeechRecognizerNamespace.Interfaces
+﻿public interface IGetResult
 {
-    public interface IGetResult
-    {
-        void getResult(string result);
-    }
+    void getResult(string result);
 }

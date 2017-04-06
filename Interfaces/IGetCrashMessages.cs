@@ -1,7 +1,11 @@
-﻿namespace MultiplatformSpeechRecognizerNamespace.Interfaces
+﻿/// <summary>
+/// 
+/// </summary>
+public interface IGetCrashMessages
 {
-    public interface IGetCrashMessages
-    {
-        void getCrashMessages(string message);
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    void getCrashMessages(string message);
 }

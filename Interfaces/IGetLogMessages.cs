@@ -1,7 +1,5 @@
-﻿namespace MultiplatformSpeechRecognizerNamespace.Interfaces
+﻿
+public interface IGetLogMessages
 {
-    public interface IGetLogMessages
-    {
-        void getLogMessages(string message);
-    }
+    void getLogMessages(string message);
 }

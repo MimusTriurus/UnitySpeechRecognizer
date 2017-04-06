@@ -1,7 +1,4 @@
-﻿namespace MultiplatformSpeechRecognizerNamespace.Interfaces
+﻿public interface IGetSpeechRecognizerInitResult
 {
-    public interface IGetSpeechRecognizerInitResult
-    {
-        void getSpeechRecognizerInitResult(bool result);
-    }
+    void getSpeechRecognizerInitResult(bool result);
 }

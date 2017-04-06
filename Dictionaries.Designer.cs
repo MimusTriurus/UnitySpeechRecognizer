@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MultiplatformSpeechRecognizer {
+namespace Dictionaries {
     using System;
     
     
