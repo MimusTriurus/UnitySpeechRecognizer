@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using AvailableLanguages;
 
 /// <summary>
 /// Обёртка для распознавания голоса под различные платформы
@@ -9,17 +10,17 @@ public class MultiplatformSpeechRecognizer
     /// <summary>
     /// конструктор
     /// </summary>
-    /// <param name="pParent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
-    public MultiplatformSpeechRecognizer(MonoBehaviour pParent)
+    /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
+    public MultiplatformSpeechRecognizer( MonoBehaviour parent )
     {
         switch (Application.platform)
         {
-            case RuntimePlatform.Android: pParent.gameObject.AddComponent<AndroidSpeechRecognizer>(); break;
-            case RuntimePlatform.WindowsEditor: pParent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
-            case RuntimePlatform.WindowsPlayer: pParent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
+            case RuntimePlatform.Android: parent.gameObject.AddComponent<AndroidSpeechRecognizer>(); break;
+            case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
+            case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>(); break;
             case RuntimePlatform.LinuxPlayer:; break;
         }
-        _speechRecognizer = pParent.GetComponent<BaseSpeechRecognizer>();
+        _speechRecognizer = parent.GetComponent<BaseSpeechRecognizer>();
         if (_speechRecognizer == null)
         {
             Debug.Log("empty component speechRecognizer");
@@ -29,108 +30,97 @@ public class MultiplatformSpeechRecognizer
     /// <summary>
     /// инициализация платформозависимого распознавателя голоса 
     /// </summary>
-    /// <param name="pLanguage">язык - для выбора директории с языковой моделью и словарём</param>
-    /// <param name="pGrammars">массив грамматик со словами</param>
-    /// <param name="pKeyword">ключевое слово инициирующее поиск (ok google)</param>
-    /// <param name="pThreshold">порог срабатывания ключеового слова</param>
-    public void init(string pLanguage = "eng", GrammarFileStruct[] pGrammars = null, string pKeyword = "", double pThreshold = 1e+10f)
+    /// <param name="language">язык - для выбора директории с языковой моделью и словарём</param>
+    /// <param name="grammars">массив грамматик со словами</param>
+    /// <param name="keyword">ключевое слово инициирующее поиск (ok google)</param>
+    /// <param name="threshold">порог срабатывания ключеового слова</param>
+    public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f )
     {
         //readDictionaryFromResources("");
-        if (_speechRecognizer == null)
+        if ( _speechRecognizer == null )
             return;
-        if (pGrammars == null)
+        if ( grammars == null )
             return;
-        if (pGrammars.Length == 0)
+        if ( grammars.Length == 0 )
             return;
         // все слова в нижний регистр
-        foreach (GrammarFileStruct grammar in pGrammars)
+        foreach ( GrammarFileStruct grammar in grammars )
         {
-            for (int i = 0; i < grammar.words.Length; i++)
+            for ( int i = 0; i < grammar.words.Length; i++ )
             {
-                grammar.words[i] = grammar.words[i].ToLower();
+                grammar.words[ i ] = grammar.words[ i ].ToLower( );
             }
         }
-        _speechRecognizer.keywordThreshold = pThreshold;
-
-        initSpeechRecognizer(pLanguage, pGrammars, pKeyword.ToLower());
+        _speechRecognizer.keywordThreshold = threshold;
+        initSpeechRecognizer( language, grammars, keyword );
     }
-    private void initSpeechRecognizer(string pLanguage, GrammarFileStruct[] pGrammars, string pKeyword = "")
+
+    private void initSpeechRecognizer( string language, GrammarFileStruct[ ] grammars, string keyword )
     {
-        _speechRecognizer.initialization(pLanguage, pGrammars, pKeyword);
+        _speechRecognizer.initialization( language, grammars, keyword );
     }
 
     #region определяем методы-приёмники результатов работы библиотеки распознавания
     /// <summary>
     /// устанавливает связь сигнала со слотом получения результатов распознавания
     /// </summary>
-    /// <param name="pResultReciever">интерфейсная ссылка на объект приёмник</param>
-    public void setResultRecieverMethod(IGetResult pResultReciever)
-    {
+    /// <param name="resultReciever">интерфейсная ссылка на объект приёмник</param>
+    public void setResultRecieverMethod( IGetResult resultReciever ) {
         if (_speechRecognizer != null)
-            _speechRecognizer.recognitionResult += pResultReciever.getResult;
+            _speechRecognizer.recognitionResult += resultReciever.getResult;
     }
     /// <summary>
     /// устанавливает связь сигнала со слотом получения сообщений для вывода в лог
     /// </summary>
-    /// <param name="pMessagesReciever">интерфейсная ссылка на объект приёмник</param>
-    public void setMessagesFromLogRecieverMethod(IGetLogMessages pMessagesReciever)
-    {
-        log = pMessagesReciever;// удалить
+    /// <param name="messagesReciever">интерфейсная ссылка на объект приёмник</param>
+    public void setMessagesFromLogRecieverMethod( IGetLogMessages messagesReciever ) {
         if (_speechRecognizer != null)
-            _speechRecognizer.logFromRecognizer += pMessagesReciever.getLogMessages;
+            _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
     }
-    IGetLogMessages log = null; // удалить
     /// <summary>
     ///  устанавливает связь сигнала со слотом получения сообщений об ошибках для вывода в лог
     /// </summary>
-    /// <param name="pCrashMessReciever">интерфейсная ссылка на объект приёмник</param>
-    public void setCrashMessagesRecieverMethod(IGetCrashMessages pCrashMessReciever)
-    {
-        if (_speechRecognizer != null)
-            _speechRecognizer.errorMessage += pCrashMessReciever.getCrashMessages;
+    /// <param name="crashMessReciever">интерфейсная ссылка на объект приёмник</param>
+    public void setCrashMessagesRecieverMethod( IGetCrashMessages crashMessReciever ) {
+        if ( _speechRecognizer != null )
+            _speechRecognizer.errorMessage += crashMessReciever.getCrashMessages;
     }
-
     /// <summary>
-    /// устанавливает связь сигнала со слотом получения результатов инициализации распознавателя голоса в соответствующей библиотеке
+    /// устанавливает связь сигнала со слотом получения результатов инициализации
     /// </summary>
-    /// <param name="pResultReciever"></param>
-    public void setInitResultMethod(IGetSpeechRecognizerInitResult pResultReciever)
-    {
+    /// <param name="initResultReciever"></param>
+    public void setInitResultRecieverMethod( IGetInitResult initResultReciever )     {
         if (_speechRecognizer != null)
-            _speechRecognizer.initializationResult += pResultReciever.getSpeechRecognizerInitResult;
+            _speechRecognizer.initResult += initResultReciever.initComplete;
     }
     #endregion
     /// <summary>
     /// микрофон на запись - начало распознавания
     /// </summary>
-    public void startListening()
-    {
-        if (_speechRecognizer != null)
-            _speechRecognizer.startListening();
+    public void startListening( ) {
+        if ( _speechRecognizer != null )
+            _speechRecognizer.startListening( );
     }
     /// <summary>
     /// отключение микрофона - конец распознавания
     /// </summary>
-    public void stopListening()
-    {
-        if (_speechRecognizer != null)
-            _speechRecognizer.stopListening();
+    public void stopListening( ) {
+        if ( _speechRecognizer != null )
+            _speechRecognizer.stopListening( );
     }
     /// <summary>
     /// меняем грамматику.меняем набор слов доступных для распознавания
     /// </summary>
-    /// <param name="pGrammarName">имя грамматики или ключевое слово</param>
-    public void switchGrammar(string pGrammarName)
-    {
-        if (_speechRecognizer != null)
-            _speechRecognizer.switchGrammar(pGrammarName);
+    /// <param name="grammarName">имя грамматики или ключевое слово</param>
+    public void switchGrammar( string grammarName ) {
+        if ( _speechRecognizer != null )
+            _speechRecognizer.switchGrammar( grammarName );
     }
     /// <summary>
     /// инициализируем поиск ключевого слова (OK GOOGLE)
     /// </summary>
-    public void searchKeyword()
-    {
-        if (_speechRecognizer != null)
-            _speechRecognizer.searchKeyword();
+    public void searchKeyword( ) {
+        if ( _speechRecognizer != null )
+            _speechRecognizer.searchKeyword( );
     }
 }

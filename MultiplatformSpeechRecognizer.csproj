@@ -48,15 +48,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AvailableLanguages.cs" />
     <Compile Include="Dictionaries.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Dictionaries.resx</DependentUpon>
     </Compile>
     <Compile Include="Grammar\GrammarFileStruct.cs" />
+    <Compile Include="Interfaces\IGetInitResult.cs" />
     <Compile Include="Interfaces\IGetLogMessages.cs" />
     <Compile Include="Interfaces\IGetResult.cs" />
-    <Compile Include="Interfaces\IGetSpeechRecognizerInitResult.cs" />
     <Compile Include="Interfaces\IGetCrashMessages.cs" />
     <Compile Include="MultiplatformSpeechRecognizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

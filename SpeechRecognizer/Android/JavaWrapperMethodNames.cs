@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JavaWrapperMethodNamesNamespace
-{
+namespace JavaWrapperMethodNamesNamespace {
     /// <summary>
     /// имена методов импортируемых из android библиотеки
     /// </summary>
-    public static class JavaWrapperMethodNames
-    {
+    public static class JavaWrapperMethodNames {
         /// <summary>
         /// устанавливает имя объекта принимающего колбэки из библиотеки 
         /// </summary>
@@ -30,6 +28,10 @@ namespace JavaWrapperMethodNamesNamespace
         /// устанавливает имя метода-приёмника рузультатов инициализации распознавателя 
         /// </summary>
         public const string SET_INITIALIZATION_COMPLETE_METHOD = "setInitializationCompleteMethod";
+        /// <summary>
+        /// устанавливает имя метода-приёмника сообщений об ошибках
+        /// </summary>
+        public const string SET_CRASH_MESS_RECIEVER_METHOD = "setCrashMessageRecieverMethod";
         /// <summary>
         /// метод начала инициализации распознаваетля 
         /// </summary>

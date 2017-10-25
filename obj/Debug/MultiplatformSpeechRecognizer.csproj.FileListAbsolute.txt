@@ -15,3 +15,4 @@ E:\Projects\Unity3D\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechReco
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.Dictionaries.resources
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.csproj.GenerateResource.Cache
 E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.dll
+E:\Projects\Unity3D\MultiplatformSpeechRecognizer\obj\Debug\MultiplatformSpeechRecognizer.csprojResolveAssemblyReference.cache

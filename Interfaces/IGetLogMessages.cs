@@ -1,5 +1,10 @@
-﻿
-public interface IGetLogMessages
-{
-    void getLogMessages(string message);
+﻿/// <summary>
+/// 
+/// </summary>
+public interface IGetLogMessages {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    void getLogMessages( string message );
 }

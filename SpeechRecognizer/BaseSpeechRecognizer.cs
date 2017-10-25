@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
+using AvailableLanguages;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
@@ -16,13 +17,12 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
     protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
 
-    protected abstract void setKeywordThreshold(double pValue = 1e+10f);
+    protected abstract void setKeywordThreshold( double pValue = 1e+10f );
     /// <summary>
     /// порог срабатывания при распознавании ключевого слова
     /// </summary>
-    public double keywordThreshold
-    {
-        set { setKeywordThreshold(value); }
+    public double keywordThreshold {
+        set { setKeywordThreshold( value ); }
     }
     /// <summary>
     /// результат инициализации speechRecognizer
@@ -33,65 +33,51 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// </summary>
     protected float _interval = 100;
     /// <summary>
-    /// если инициализация speechRecognizer успешна
-    /// </summary>
-    protected const string INIT_IS_OK = "initComplete";
-    /// <summary>
     /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
     /// </summary>
     protected static BaseSpeechRecognizer _instance = null;
     /// <summary>
-    /// делегат возврата строки (использует сигналы - logFromRecognizer, partialRecognitionResult, recognitionResult)
-    /// </summary>
-    /// <param name="value"></param>
-    public delegate void ReturnStringValue(string value);
-    /// <summary>
-    /// делегат возврата булева значения (использует сигнал - initializationResult)
-    /// </summary>
-    /// <param name="value"></param>
-    public delegate void ReturnBoolValue(bool value);
-    /// <summary>
     /// сигнал с сообщением отладки из библиотеки распознования
     /// </summary>
-    public ReturnStringValue logFromRecognizer;
+    public Action<string> logFromRecognizer;
     /// <summary>
     /// сигнал с сообщением об ошибке
     /// </summary>
-    public ReturnStringValue errorMessage;
-    /// <summary>
-    /// сигнал с промежуточным результатом распознавания
-    /// </summary>
-    public ReturnStringValue partialRecognitionResult;
+    public Action<string> errorMessage;
     /// <summary>
     /// сигнал с результатом распознавания
     /// </summary>
-    public ReturnStringValue recognitionResult;
+    public Action<string> recognitionResult;
     /// <summary>
-    /// сигнал с результатом инициализации распознавателя
+    /// сигнал с результатом инициализации объекта 
+    /// распознавания голоса
     /// </summary>
-    public ReturnBoolValue initializationResult;
+    public Action<bool> initResult;
     /// <summary>
     /// начало записи голоса с микрофона
     /// </summary>
-    public abstract void startListening();
+    public abstract void startListening( );
     /// <summary>
     /// окончание записи голоса с микрофона
     /// </summary>
-    public abstract void stopListening();
+    public abstract void stopListening( );
     /// <summary>
     /// смена граматики(перечень слов доступных для распознавания)
     /// </summary>
     /// <param name="grammarName">имя грамматики</param>
-    public abstract void switchGrammar(string grammarName);
-
-    public abstract void searchKeyword();
+    public abstract void switchGrammar( string grammarName );
+    /// <summary>
+    /// Инициализируем поиск ключевого слова
+    /// </summary>
+    public abstract void searchKeyword( );
     /// <summary>
     /// инициализируем распознаватель голоса
     /// </summary>
-    /// <param name="pLanguage">язык - определяет дирректорию с акустической моделью, словарями и файлами граматики</param>
-    /// <param name="pGrammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
-    /// <param name="pKeyword">ключевое слово</param>
-    public abstract void initialization(string pLanguage = "", GrammarFileStruct[] pGrammars = null, string pKeyword = "");
+    /// <param name="language">язык - определяет дирректорию с акустической моделью, словарями и файлами граматики</param>
+    /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
+    /// <param name="keyword">ключевое слово</param>
+    /// <returns>результат инициализации</returns>
+    public abstract void initialization( string language, GrammarFileStruct[] grammars, string keyword );
 
     #region baseGrammar
     /// <summary>
@@ -102,7 +88,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// переопределяет файл грамматики поумолчанию
     /// </summary>
     /// <param name="grammarName">имя файла грамматики</param>
-    public void setBaseGrammarName(string grammarName)
+    public void setBaseGrammarName( string grammarName )
     {
         _baseGrammar = grammarName;
     }
@@ -110,89 +96,60 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// устанавливает файл грамматики поумолчанию равным первому элементу из массива структур грамматики
     /// </summary>
     /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
-    protected void getBaseGrammar(GrammarFileStruct[] grammars)
-    {
-        if (_baseGrammar == string.Empty)
-        {
-            _baseGrammar = grammars[0].name;
+    protected void getBaseGrammar( GrammarFileStruct[ ] grammars ) {
+        if ( _baseGrammar == string.Empty ) {
+            _baseGrammar = grammars[ 0 ].name;
         }
     }
     #endregion
-
-    /// <summary>
-    /// метод-приёмник сообщений отладки из нативной android библиотеки SpeechRecognizer.jar
-    /// </summary>
-    /// <param name="pMessage"></param>
-    protected void onCallbackLogFromLib(string pMessage)
-    {
-        if (BaseSpeechRecognizer._instance.logFromRecognizer != null)
-        {
-            BaseSpeechRecognizer._instance.logFromRecognizer(pMessage);
-        }
+    protected virtual void onInitResult( string value ) {
+        _init = Boolean.Parse( value );
+        BaseSpeechRecognizer._instance.initResult?.Invoke( _init );
     }
     /// <summary>
-    /// метод-приёмник результатов инициализации SpeechRecognizer из нативной android библиотеки SpeechRecognizer.jar
+    /// метод-приёмник сообщений отладки из библиотек распознавания голоса
     /// </summary>
-    /// <param name="pMessage"></param>
-    protected void onCallbackInitResultFromLib(string pMessage)
-    {
-        logFromRecognizer("result:" + pMessage);
-        if (BaseSpeechRecognizer._instance.initializationResult != null)
-        {
-            if (pMessage == INIT_IS_OK)
-            {
-                BaseSpeechRecognizer._instance.initializationResult(true); // исправить на фолс
-                _init = true;
-            }
-            else
-            {
-                BaseSpeechRecognizer._instance.initializationResult(false);
-                _init = false;
-            }
-        }
+    /// <param name="message"></param>
+    protected void onRecieveLogMess( string message ) {
+        BaseSpeechRecognizer._instance.logFromRecognizer?.Invoke( message );
     }
     /// <summary>
-    /// метод-приёмник результатов распознавания из нативной android библиотеки SpeechRecognizer.jar
+    /// метод-приёмник результатов распознавания из библиотек распознавания голоса
     /// </summary>
-    /// <param name="pMessage"></param>
-    protected void onRecognitionResult(string pMessage)
-    {
-        try
-        {
-            if (BaseSpeechRecognizer._instance != null)
-                BaseSpeechRecognizer._instance.recognitionResult(pMessage);
-        }
-        catch (System.NullReferenceException e)
-        {
-            this.logFromRecognizer("error:" + e.Message);
-        }
+    /// <param name="message"></param>
+    protected void onRecognitionResult( string message ) {
+        BaseSpeechRecognizer._instance.recognitionResult?.Invoke( message );
+    }
+    /// <summary>
+    /// метод-приёмник ошибок в работе библиотек распознавания голоса
+    /// </summary>
+    /// <param name="message"></param>
+    protected void onError( string message ) {
+        BaseSpeechRecognizer._instance.errorMessage?.Invoke( message );
     }
     /// <summary>
     /// получаем актуальный словарь
     /// </summary>
-    /// <param name="pLanguage">язык словаря</param>
-    /// <param name="pGrammars">список слов для внесения в словарь</param>
-    /// <param name="pKeyword">ключевое слово</param>
+    /// <param name="language">язык словаря</param>
+    /// <param name="grammars">список слов для внесения в словарь</param>
+    /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь (слово, транскрипция)</returns>
-    protected Dictionary<string, string> getWordsPhones(string pLanguage = "", GrammarFileStruct[] pGrammars = null, string pKeyword = "")
-    {
-        if (pLanguage != string.Empty)
-        {
+    protected Dictionary< string, string > getWordsPhones( string language, GrammarFileStruct[ ] grammars, string keyword ) {
+        if ( language != string.Empty ) {
             string dictName = string.Empty;
-            switch (pLanguage)
-            {
-                case "eng": dictName = "EngDictionary"; break;
-                case "esp": dictName = "EspDictionary"; break;
-                case "fr": dictName = "FrDictionary"; break;
-                case "ger": dictName = "GerDictionary"; break;
-                case "it": dictName = "ItDictionary"; break;
-                case "ru": dictName = "RuDictionary"; break;
+            onRecieveLogMess( "lang:" + language);
+            switch ( language ) {
+                case Language.en_US: dictName = "EngDictionary"; break;
+                case Language.es_ES: dictName = "EspDictionary"; break;
+                case Language.fr_FR: dictName = "FrDictionary"; break;
+                case Language.de_DE: dictName = "GerDictionary"; break;
+                case Language.it_IT: dictName = "ItDictionary"; break;
+                case Language.ru_RU: dictName = "RuDictionary"; break;
             }
-            if (dictName != string.Empty)
-            {
-                Dictionary<string, string> baseDict = readDictionaryFromResources(dictName);
-                if (baseDict == null) Debug.Log("getWordsPhones empty dict"); else Debug.Log("getWordsPhones dict");
-                return getActualDictionary(ref baseDict, pGrammars, pKeyword);
+            if ( dictName != string.Empty ) {
+                Dictionary< string, string > baseDict = readDictionaryFromResources( dictName );
+                if ( baseDict == null ) Debug.Log( "getWordsPhones empty dict" ); else Debug.Log( "getWordsPhones dict" );
+                return getActualDictionary( ref baseDict, grammars, keyword );
             }
             else
                 return null;
@@ -203,15 +160,13 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// <summary>
     /// считывание полного(базового) словаря из ресурсов
     /// </summary>
-    /// <param name="pDictName">имя словаря</param>
+    /// <param name="dictName">имя словаря</param>
     /// <returns>словарь (слово, транскрипция)</returns>
-    private Dictionary<string, string> readDictionaryFromResources(string pDictName)
-    {
-        ResourceManager rm = new ResourceManager("MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly());
-        if (rm != null)
-        {
-            string dataText = rm.GetString(pDictName);
-            Dictionary<string, string> transriptionContainer = dataText.TrimEnd('\n').Split('\n').ToDictionary(item => item.Split(' ')[0], item => item.Remove(0, item.IndexOf(" ") + 1));
+    private Dictionary< string, string > readDictionaryFromResources( string dictName ) {
+        ResourceManager rm = new ResourceManager( "MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly( ) );
+        if ( rm != null ) {
+            string dataText = rm.GetString( dictName );
+            Dictionary<string, string> transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( ' ' )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
             return transriptionContainer;
         }
         else
@@ -220,37 +175,32 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// <summary>
     /// формируем актуальный словарь
     /// </summary>
-    /// <param name="pDict">полный(базовый) словарь </param>
-    /// <param name="pGrammars">слова для внесения в актуальный словарь</param>
-    /// <param name="pKeyword">ключевое слово</param>
+    /// <param name="dict">полный(базовый) словарь </param>
+    /// <param name="grammars">слова для внесения в актуальный словарь</param>
+    /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь со словами из GrammarFileStruct</returns>
-    private Dictionary<string, string> getActualDictionary(ref Dictionary<string, string> pDict, GrammarFileStruct[] pGrammars = null, string pKeyword = "")
-    {
+    private Dictionary<string, string> getActualDictionary( ref Dictionary< string, string > dict, GrammarFileStruct[ ] grammars, string keyword ) {
         Dictionary<string, string> actualDict = new Dictionary<string, string>();
-        foreach (GrammarFileStruct grammar in pGrammars)
-        {
-            foreach (string word in grammar.words)
-            {
-                if (pDict.ContainsKey(word))
-                {
-                    if (!actualDict.ContainsKey(word))
-                    {
-                        actualDict.Add(word, pDict[word]);
-                        Debug.Log("add word:" + word + " phones:" + pDict[word]);
+        foreach ( GrammarFileStruct grammar in grammars ) {
+            foreach ( string word in grammar.words ) {
+                if ( dict.ContainsKey( word ) ) {
+                    if ( !actualDict.ContainsKey( word ) ) {
+                        actualDict.Add( word, dict[ word ] );
                     }
                     else
-                        this.errorMessage("dictionary already contains word [" + word + "]");
+                        this.errorMessage( "dictionary already contains word [" + word + "]" );
                 }
                 else
-                    this.errorMessage("word [" + word + "] not found");
+                    this.errorMessage( "word [" + word + "] not found" );
             }
         }
             
-        if ((pDict.ContainsKey(pKeyword)) && (!actualDict.ContainsKey(pKeyword)))
-            actualDict.Add(pKeyword, pDict[pKeyword]);
-        else
-            this.errorMessage("keyword [" + pKeyword + "] not found");
-            
+        if ( keyword != string.Empty ) {
+            if ( dict.ContainsKey( keyword ) && !actualDict.ContainsKey( keyword ) )
+                actualDict.Add( keyword, dict[ keyword ] );
+            else
+                this.errorMessage( "keyword [" + keyword + "] not found" );
+        } 
         return actualDict;
     }
 }
