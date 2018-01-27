@@ -7,8 +7,7 @@ using AvailableLanguages;
 /// <summary>
 /// класс распознавания голоса для Windows x64
 /// </summary>
-internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
-{
+internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
     private const string DLL_NAME = "SpeechRecognizer";
 
     #region импортированные из библиотеки статические методы

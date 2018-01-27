@@ -28,12 +28,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\..\Unity3D\unity_speech_recognizer\Assets\Plugins\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechRecognizer.XML</DocumentationFile>
+    <DocumentationFile>..\..\Unity3D\unity_speech_recognizer\Assets\Plugins\MultiplatformSpeechRecognizer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
