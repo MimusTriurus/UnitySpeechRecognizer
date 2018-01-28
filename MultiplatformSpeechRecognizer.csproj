@@ -64,11 +64,9 @@
     <Compile Include="SpeechRecognizer\Android\AndroidSpeechRecognizer.cs" />
     <Compile Include="SpeechRecognizer\BaseSpeechRecognizer.cs" />
     <Compile Include="SpeechRecognizer\Android\JavaWrapperMethodNames.cs" />
-    <Compile Include="SpeechRecognizer\Windows\WindowsSpeechRecognizer.cs" />
+    <Compile Include="SpeechRecognizer\Desktop\DesktopSpeechRecognizer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SpeechRecognizer\Linux\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Dictionaries.resx">
       <Generator>ResXFileCodeGenerator</Generator>

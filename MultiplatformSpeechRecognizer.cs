@@ -12,12 +12,11 @@ public class MultiplatformSpeechRecognizer {
     /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
     public MultiplatformSpeechRecognizer( MonoBehaviour parent ) {
         switch ( Application.platform ) {
-            case RuntimePlatform.Android: parent.gameObject.AddComponent<AndroidSpeechRecognizer>( ); break;
-            case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<WindowsSpeechRecognizer>( ); break;
-            case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>( ); break;
-            case RuntimePlatform.LinuxPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>( ); break;
+            case RuntimePlatform.Android:       parent.gameObject.AddComponent<AndroidSpeechRecognizer>( ); break;
+            case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
+            case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
+            case RuntimePlatform.LinuxPlayer:   parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
         }
-        Debug.Log( "Platform:" + Application.platform );
         _speechRecognizer = parent.GetComponent<BaseSpeechRecognizer>( );
         if ( _speechRecognizer == null ) {
             Debug.Log( "empty component speechRecognizer" );
