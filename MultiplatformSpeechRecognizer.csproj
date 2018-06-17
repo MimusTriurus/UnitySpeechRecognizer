@@ -28,12 +28,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\..\Unity3D\unity_speech_recognizer\Assets\Plugins\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\UnitySpeechRecognizer\Assets\Plugins\MultiplatformSpeechRecognizer.XML</DocumentationFile>
+    <DocumentationFile>..\..\Unity3D\unity_speech_recognizer\Assets\Plugins\MultiplatformSpeechRecognizer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -64,11 +64,9 @@
     <Compile Include="SpeechRecognizer\Android\AndroidSpeechRecognizer.cs" />
     <Compile Include="SpeechRecognizer\BaseSpeechRecognizer.cs" />
     <Compile Include="SpeechRecognizer\Android\JavaWrapperMethodNames.cs" />
-    <Compile Include="SpeechRecognizer\Windows\WindowsSpeechRecognizer.cs" />
+    <Compile Include="SpeechRecognizer\Desktop\DesktopSpeechRecognizer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SpeechRecognizer\Linux\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Dictionaries.resx">
       <Generator>ResXFileCodeGenerator</Generator>

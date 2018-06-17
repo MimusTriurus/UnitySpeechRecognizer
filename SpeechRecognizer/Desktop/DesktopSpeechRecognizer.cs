@@ -5,9 +5,13 @@ using System.Collections.Generic;
 using AvailableLanguages;
 
 /// <summary>
-/// класс распознавания голоса для Windows x64
+/// класс распознавания голоса для Windows, Linux
 /// </summary>
+<<<<<<< HEAD:SpeechRecognizer/Windows/WindowsSpeechRecognizer.cs
 internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
+=======
+internal class DesktopSpeechRecognizer : BaseSpeechRecognizer {
+>>>>>>> master:SpeechRecognizer/Desktop/DesktopSpeechRecognizer.cs
     private const string DLL_NAME = "SpeechRecognizer";
 
     #region импортированные из библиотеки статические методы
@@ -84,17 +88,23 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
         this.onRecieveLogMess( "start initialization" );
         bool result = false;
         #region инициализируем SpeechRecognizer
-        string destination = Application.streamingAssetsPath + "/acousticModels/" + language + "/";
+        var destination = Application.streamingAssetsPath + "/acousticModels/" + language + "/";
         result = runRecognizerSetup( destination );
         if ( !result ) {
+<<<<<<< HEAD:SpeechRecognizer/Windows/WindowsSpeechRecognizer.cs
             this.onError( ERROR_ON_INIT + " " + destination );
             //this.initResult.Invoke( false );
             this.onInitResult( FALSE );
+=======
+            this.onError( ERROR_ON_INIT + " " +destination );
+            this.initResult?.Invoke( false );
+>>>>>>> master:SpeechRecognizer/Desktop/DesktopSpeechRecognizer.cs
             return;
         }
         #endregion
 
         #region добавляем слова в словарь
+<<<<<<< HEAD:SpeechRecognizer/Windows/WindowsSpeechRecognizer.cs
         var phonesDict = getWordsPhones( language, ref grammars, ref keyword );
         if ( phonesDict == null ) {
             this.onError( "error on init dictionary" );
@@ -109,6 +119,19 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
                 this.onError( ERROR_ON_ADD_WORD + ":" + "[" + word + "] " + "phones:[" + phonesDict[ word ] + "]" );
                 //this.initResult.Invoke( false );
                 this.onInitResult( FALSE );
+=======
+        var phonesDict = getWordsPhones( language, grammars, keyword );
+        if ( phonesDict == null ) {
+            this.onError( "error on init dictionary" );
+            this.initResult?.Invoke( false );
+            return;
+        }
+        foreach ( string word in phonesDict.Keys ) {
+            result = addWordIntoDictionary( word, phonesDict[ word ] );
+            if ( !result ) {
+                this.onError( ERROR_ON_ADD_WORD + ":" + "[" + word + "] " + "phones:[" + phonesDict[ word ] + "]" );
+                this.initResult?.Invoke( false );
+>>>>>>> master:SpeechRecognizer/Desktop/DesktopSpeechRecognizer.cs
                 return;
             }
         }
@@ -118,6 +141,7 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
         string[ ] grammar = new string[ 2 ];
         foreach ( GrammarFileStruct gramm in grammars ) {
             grammar[ 0 ] = gramm.name;
+<<<<<<< HEAD:SpeechRecognizer/Windows/WindowsSpeechRecognizer.cs
             grammar[ 1 ] = gramm.toString( );
             this.onRecieveLogMess( "try add grammar" + grammar[ 1 ] );
             result = addGrammarString( grammar[ 0 ], grammar[ 1 ] );
@@ -125,6 +149,13 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
                 this.onError( ERROR_ON_ADD_GRAMMAR + " " + gramm.name );
                 //this.initResult.Invoke( false );
                 this.onInitResult( FALSE );
+=======
+            grammar[ 1 ] = gramm.toString();
+            result = addGrammarString(grammar[ 0 ], grammar[ 1 ] );
+            if ( !result ) {
+                this.onError( ERROR_ON_ADD_GRAMMAR + " " + gramm.name );
+                this.initResult?.Invoke( false );
+>>>>>>> master:SpeechRecognizer/Desktop/DesktopSpeechRecognizer.cs
                 return;
             }
         }
@@ -133,6 +164,10 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
         if ( keyword != string.Empty ) {
             this.onRecieveLogMess( "try add keyword:" + keyword );
             setKeyword( keyword );
+<<<<<<< HEAD:SpeechRecognizer/Windows/WindowsSpeechRecognizer.cs
+=======
+            this.onRecieveLogMess( "add keyword:" + keyword );
+>>>>>>> master:SpeechRecognizer/Desktop/DesktopSpeechRecognizer.cs
         }
         #endregion
         //this.initResult.Invoke( true );

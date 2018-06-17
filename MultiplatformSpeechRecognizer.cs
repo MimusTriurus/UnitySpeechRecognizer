@@ -12,14 +12,14 @@ public class MultiplatformSpeechRecognizer {
     /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
     public MultiplatformSpeechRecognizer( MonoBehaviour parent ) {
         switch ( Application.platform ) {
-            case RuntimePlatform.Android: parent.gameObject.AddComponent<AndroidSpeechRecognizer>( ); break;
-            case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<WindowsSpeechRecognizer>( ); break;
-            case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<WindowsSpeechRecognizer>( ); break;
-            case RuntimePlatform.LinuxPlayer:; break;
+            case RuntimePlatform.Android:       parent.gameObject.AddComponent<AndroidSpeechRecognizer>( ); break;
+            case RuntimePlatform.WindowsEditor: parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
+            case RuntimePlatform.WindowsPlayer: parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
+            case RuntimePlatform.LinuxPlayer:   parent.gameObject.AddComponent<DesktopSpeechRecognizer>( ); break;
         }
         _speechRecognizer = parent.GetComponent<BaseSpeechRecognizer>( );
         if ( _speechRecognizer == null ) {
-            Debug.Log("empty component speechRecognizer");
+            Debug.Log( "empty component speechRecognizer" );
             return;
         }
     }
@@ -58,7 +58,7 @@ public class MultiplatformSpeechRecognizer {
     /// </summary>
     /// <param name="resultReciever">интерфейсная ссылка на объект приёмник</param>
     public void setResultRecieverMethod( IGetResult resultReciever ) {
-        if (_speechRecognizer != null)
+        if ( _speechRecognizer != null )
             _speechRecognizer.recognitionResult += resultReciever.getResult;
     }
     /// <summary>
@@ -66,7 +66,7 @@ public class MultiplatformSpeechRecognizer {
     /// </summary>
     /// <param name="messagesReciever">интерфейсная ссылка на объект приёмник</param>
     public void setMessagesFromLogRecieverMethod( IGetLogMessages messagesReciever ) {
-        if (_speechRecognizer != null)
+        if ( _speechRecognizer != null )
             _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
     }
     /// <summary>
@@ -81,8 +81,8 @@ public class MultiplatformSpeechRecognizer {
     /// устанавливает связь сигнала со слотом получения результатов инициализации
     /// </summary>
     /// <param name="initResultReciever"></param>
-    public void setInitResultRecieverMethod( IGetInitResult initResultReciever )     {
-        if (_speechRecognizer != null)
+    public void setInitResultRecieverMethod( IGetInitResult initResultReciever ) {
+        if ( _speechRecognizer != null )
             _speechRecognizer.initResult += initResultReciever.initComplete;
     }
     #endregion

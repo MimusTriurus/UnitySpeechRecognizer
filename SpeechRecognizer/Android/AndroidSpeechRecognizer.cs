@@ -26,7 +26,7 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
             return;
         }
 
-        _recognizerActivity = unity.GetStatic< AndroidJavaObject >("currentActivity");
+        _recognizerActivity = unity.GetStatic< AndroidJavaObject >( "currentActivity" );
         if ( _recognizerActivity == null ) {
             this.onError( "empty java object" );
             this.initResult.Invoke( false );
@@ -36,10 +36,10 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
 
         #region инициализируем колбэк из jar библиотеки
         _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_RECIEVER_OBJECT_NAME, this.gameObject.name );
-        _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_LOG_RECIEVER_METHOD_NAME, "onRecieveLogMess");
+        _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_LOG_RECIEVER_METHOD_NAME, "onRecieveLogMess" );
         _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_RECOGNITION_RESULT_RECIEVER_METHOD, "onRecognitionResult" );
-        _recognizerActivity.CallStatic(JavaWrapperMethodNames.SET_CRASH_MESS_RECIEVER_METHOD, "onError");
-        _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_INITIALIZATION_COMPLETE_METHOD, "onInitResult");
+        _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_CRASH_MESS_RECIEVER_METHOD, "onError" );
+        _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_INITIALIZATION_COMPLETE_METHOD, "onInitResult" );
         #endregion
         _recognizerActivity.Call( JavaWrapperMethodNames.SET_BASE_GRAMMAR_FILE, _baseGrammar );
         this.onRecieveLogMess( JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP );
@@ -56,15 +56,8 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
             //this.logFromRecognizer( "add word:" + word + " phones:" + _phonesDict[ word ] );
             _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_WORD_INTO_DICTIONARY, word, _phonesDict[ word ] );
         }
-
-        #region добавляем граматику
-        string[ ] grammar = new string[ 2 ];
-        foreach ( GrammarFileStruct gramm in _grammars )
-        {
-            grammar[0] = gramm.name;
-            grammar[1] = gramm.toString();
-            //onRecieveLogMess( "GRAMM" + gramm.toString( ) );
-            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_GRAMMAR_STRING, grammar[ 0 ], grammar[ 1 ] );
+        else {
+            onError( "error on init acoustic model" );
         }
         #endregion
 
