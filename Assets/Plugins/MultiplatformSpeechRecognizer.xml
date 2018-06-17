@@ -581,37 +581,37 @@
             устанавливаем порог срабатывания для ключевого слова
             </summary>
         </member>
-        <member name="T:WindowsSpeechRecognizer">
+        <member name="T:DesktopSpeechRecognizer">
             <summary>
-            класс распознавания голоса для Windows x64
+            класс распознавания голоса для Windows, Linux
             </summary>
         </member>
-        <member name="M:WindowsSpeechRecognizer.setResultReciever(WindowsSpeechRecognizer.FPtr)">
+        <member name="M:DesktopSpeechRecognizer.setResultReciever(DesktopSpeechRecognizer.FPtr)">
             <summary>
             метод-приёмник результатов распознавания речи из нативной Win библиотеки SpeechRecognizer.dll
             </summary>
             <param name="t">указатель на метод</param>
         </member>
-        <member name="M:WindowsSpeechRecognizer.setLogMessReciever(WindowsSpeechRecognizer.FPtr)">
+        <member name="M:DesktopSpeechRecognizer.setLogMessReciever(DesktopSpeechRecognizer.FPtr)">
             <summary>
             метод-приёмник сообщений отладки для лога из нативной Win библиотеки SpeechRecognizer.dll
             </summary>
             <param name="t">указатель на метод</param>
         </member>
-        <member name="M:WindowsSpeechRecognizer.setCrashReciever(WindowsSpeechRecognizer.FPtr)">
+        <member name="M:DesktopSpeechRecognizer.setCrashReciever(DesktopSpeechRecognizer.FPtr)">
             <summary>
             метод-приёмник результатов инициализации SpeechRecognizer из нативной Win библиотеки SpeechRecognizer.dll
             </summary>
             <param name="t">указатель на метод</param>
         </member>
-        <member name="M:WindowsSpeechRecognizer.coUpdateWithDelay(System.Single)">
+        <member name="M:DesktopSpeechRecognizer.coUpdateWithDelay(System.Single)">
             <summary>
             таймер-уведомление о том что пора читать буффер микрофона для распознавания
             </summary>
             <param name="delayTime">интервал в милисекундах</param>
             <returns></returns>
         </member>
-        <member name="M:WindowsSpeechRecognizer.Awake">
+        <member name="M:DesktopSpeechRecognizer.Awake">
             <summary>
             порог срабатывания ключевого слова
             </summary>

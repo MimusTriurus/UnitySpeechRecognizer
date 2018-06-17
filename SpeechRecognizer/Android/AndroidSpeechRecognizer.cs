@@ -52,14 +52,20 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
 
     protected override void onInitResult( string value ) {
         onRecieveLogMess( "onInitResult:" + value );
+
         foreach ( string word in _phonesDict.Keys ) {
             //this.logFromRecognizer( "add word:" + word + " phones:" + _phonesDict[ word ] );
             _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_WORD_INTO_DICTIONARY, word, _phonesDict[ word ] );
         }
-        else {
-            onError( "error on init acoustic model" );
-        }
-        #endregion
+ 
+        string[ ] grammar = new string[ 2 ]; 
+        foreach ( GrammarFileStruct gramm in _grammars ) 
+        { 
+            grammar[0] = gramm.name; 
+            grammar[1] = gramm.toString();
+            //onRecieveLogMess( "GRAMM" + gramm.toString( ) ); 
+            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_GRAMMAR_STRING, grammar[ 0 ], grammar[ 1 ] );
+        } 
 
         #region добавляем ключевое слово(ok google) для поиска
         if ( _keyword != string.Empty )
@@ -68,9 +74,8 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
             this.onRecieveLogMess( "add keyword:" + _keyword );
         }
         #endregion
-
         _init = Boolean.Parse( value );
-        this.onInitResult( value );
+        base.onInitResult( value );
         //BaseSpeechRecognizer._instance.initResult.Invoke( _init );
     }
 
