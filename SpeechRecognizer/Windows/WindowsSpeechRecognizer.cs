@@ -7,8 +7,7 @@ using AvailableLanguages;
 /// <summary>
 /// класс распознавания голоса для Windows x64
 /// </summary>
-internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
-{
+internal class WindowsSpeechRecognizer : BaseSpeechRecognizer {
     private const string DLL_NAME = "SpeechRecognizer";
 
     #region импортированные из библиотеки статические методы
@@ -30,7 +29,7 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
     [ DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
     private static extern void setBaseGrammar( [ MarshalAs( UnmanagedType.LPStr ) ] string grammarName );
 
-    [ DllImport(DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
+    [ DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
     private static extern void setKeyword( [ MarshalAs( UnmanagedType.LPStr ) ] string keyword );
 
     [ DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
@@ -45,7 +44,7 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
     [ DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
     private static extern void readMicBuffer( );
 
-    [DllImport(DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl) ]
     private static extern void changeGrammar( [ MarshalAs( UnmanagedType.LPStr ) ] string grammarName );
 
     [ DllImport( DLL_NAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl ) ]
@@ -82,32 +81,34 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
         setCrashReciever( this.onError );
         saveLogIntoFile( false );
 
-        this.logFromRecognizer.Invoke( "start initialization" );
+        this.onRecieveLogMess( "start initialization" );
         bool result = false;
         #region инициализируем SpeechRecognizer
         string destination = Application.streamingAssetsPath + "/acousticModels/" + language + "/";
         result = runRecognizerSetup( destination );
         if ( !result ) {
-            this.errorMessage( ERROR_ON_INIT + " " +destination );
-            this.initResult?.Invoke( false );
+            this.onError( ERROR_ON_INIT + " " + destination );
+            //this.initResult.Invoke( false );
+            this.onInitResult( FALSE );
             return;
         }
         #endregion
 
         #region добавляем слова в словарь
-        var phonesDict = getWordsPhones( language, grammars, keyword );
-        if ( phonesDict == null )
-        {
-            this.errorMessage( "error on init dictionary" );
-            this.initResult?.Invoke( false );
+        var phonesDict = getWordsPhones( language, ref grammars, ref keyword );
+        if ( phonesDict == null ) {
+            this.onError( "error on init dictionary" );
+            //this.initResult.Invoke( false );
+            this.onInitResult( FALSE );
             return;
         }
         foreach ( string word in phonesDict.Keys ) {
-            this.logFromRecognizer( "add word:" + word + " phones:" + phonesDict[ word ] );
+            this.onRecieveLogMess( "add word:" + word + " phones:" + phonesDict[ word ] );
             result = addWordIntoDictionary( word, phonesDict[ word ] );
             if ( !result ) {
-                this.errorMessage( ERROR_ON_ADD_WORD + ":" + "[" + word + "] " + "phones:[" + phonesDict[ word ] + "]" );
-                this.initResult?.Invoke( false );
+                this.onError( ERROR_ON_ADD_WORD + ":" + "[" + word + "] " + "phones:[" + phonesDict[ word ] + "]" );
+                //this.initResult.Invoke( false );
+                this.onInitResult( FALSE );
                 return;
             }
         }
@@ -117,23 +118,25 @@ internal class WindowsSpeechRecognizer : BaseSpeechRecognizer
         string[ ] grammar = new string[ 2 ];
         foreach ( GrammarFileStruct gramm in grammars ) {
             grammar[ 0 ] = gramm.name;
-            grammar[ 1 ] = gramm.toString();
-            this.logFromRecognizer( grammar[ 1 ] );
-            result = addGrammarString(grammar[ 0 ], grammar[ 1 ] );
+            grammar[ 1 ] = gramm.toString( );
+            this.onRecieveLogMess( "try add grammar" + grammar[ 1 ] );
+            result = addGrammarString( grammar[ 0 ], grammar[ 1 ] );
             if ( !result ) {
-                this.errorMessage( ERROR_ON_ADD_GRAMMAR + " " + gramm.name );
-                this.initResult?.Invoke( false );
+                this.onError( ERROR_ON_ADD_GRAMMAR + " " + gramm.name );
+                //this.initResult.Invoke( false );
+                this.onInitResult( FALSE );
                 return;
             }
         }
         #endregion
         #region добавляем ключевое слово(ok google) для поиска
         if ( keyword != string.Empty ) {
+            this.onRecieveLogMess( "try add keyword:" + keyword );
             setKeyword( keyword );
-            this.logFromRecognizer( "add keyword:" + keyword );
         }
         #endregion
-        this.initResult?.Invoke( true );
+        //this.initResult.Invoke( true );
+        this.onInitResult( TRUE );
     }
 
     public override void startListening( ) {

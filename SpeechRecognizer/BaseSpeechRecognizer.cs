@@ -9,13 +9,17 @@ using System.Resources;
 /// <summary>
 /// базовый класс распознования голоса. От него наследуют классы WindowsSpeechRecognizer, AndroidSpeechRecognizer, LinuxSpeechRecognizer
 /// </summary>
-internal abstract class BaseSpeechRecognizer : MonoBehaviour
-{
+internal abstract class BaseSpeechRecognizer : MonoBehaviour {
+    protected const string TRUE = "true";
+    protected const string FALSE = "false";
+
     protected const string ERROR_ON_INIT = "crash on init ";
     protected const string ERROR_ON_ADD_GRAMMAR = "crash on add grammar ";
     protected const string ERROR_ON_ADD_WORD = "crash on add word into dictionary ";
     protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
     protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
+
+    private const string ERROR_ON_SPEECH_RECOGNIZER_IS_NULL = "BaseSpeechRecognizer singleton null";
 
     protected abstract void setKeywordThreshold( double pValue = 1e+10f );
     /// <summary>
@@ -77,7 +81,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>результат инициализации</returns>
-    public abstract void initialization( string language, GrammarFileStruct[] grammars, string keyword );
+    public abstract void initialization( string language, GrammarFileStruct[ ] grammars, string keyword );
 
     #region baseGrammar
     /// <summary>
@@ -102,30 +106,55 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
         }
     }
     #endregion
+       
     protected virtual void onInitResult( string value ) {
         _init = Boolean.Parse( value );
-        BaseSpeechRecognizer._instance.initResult?.Invoke( _init );
+        if ( BaseSpeechRecognizer._instance != null )
+            if ( BaseSpeechRecognizer._instance.initResult != null )
+                BaseSpeechRecognizer._instance.initResult.Invoke( _init );
+            else
+                UnityEngine.Debug.LogError( "use setInitResultRecieverMethod method!" );
+        else
+            UnityEngine.Debug.LogError( ERROR_ON_SPEECH_RECOGNIZER_IS_NULL );
     }
     /// <summary>
     /// метод-приёмник сообщений отладки из библиотек распознавания голоса
     /// </summary>
     /// <param name="message"></param>
     protected void onRecieveLogMess( string message ) {
-        BaseSpeechRecognizer._instance.logFromRecognizer?.Invoke( message );
+        if ( BaseSpeechRecognizer._instance != null )
+            if ( BaseSpeechRecognizer._instance.logFromRecognizer != null )
+                BaseSpeechRecognizer._instance.logFromRecognizer.Invoke( message );
+            else
+                UnityEngine.Debug.LogWarning( "use setMessagesFromLogRecieverMethod method!" );
+        else
+            UnityEngine.Debug.LogError( ERROR_ON_SPEECH_RECOGNIZER_IS_NULL );
     }
     /// <summary>
     /// метод-приёмник результатов распознавания из библиотек распознавания голоса
     /// </summary>
     /// <param name="message"></param>
     protected void onRecognitionResult( string message ) {
-        BaseSpeechRecognizer._instance.recognitionResult?.Invoke( message );
+        if ( BaseSpeechRecognizer._instance != null )
+            if ( BaseSpeechRecognizer._instance.recognitionResult != null ) 
+                BaseSpeechRecognizer._instance.recognitionResult.Invoke( message );
+            else
+                UnityEngine.Debug.LogError( "use setResultRecieverMethod method!" );
+        else
+            UnityEngine.Debug.LogError( ERROR_ON_SPEECH_RECOGNIZER_IS_NULL );
     }
     /// <summary>
     /// метод-приёмник ошибок в работе библиотек распознавания голоса
     /// </summary>
     /// <param name="message"></param>
     protected void onError( string message ) {
-        BaseSpeechRecognizer._instance.errorMessage?.Invoke( message );
+        if ( BaseSpeechRecognizer._instance != null )
+            if ( BaseSpeechRecognizer._instance.errorMessage != null )
+                BaseSpeechRecognizer._instance.errorMessage.Invoke( message );
+            else
+                UnityEngine.Debug.LogWarning( "use setCrashMessagesRecieverMethod method!" );
+        else
+            UnityEngine.Debug.LogError( ERROR_ON_SPEECH_RECOGNIZER_IS_NULL );
     }
     /// <summary>
     /// получаем актуальный словарь
@@ -134,7 +163,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// <param name="grammars">список слов для внесения в словарь</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь (слово, транскрипция)</returns>
-    protected Dictionary< string, string > getWordsPhones( string language, GrammarFileStruct[ ] grammars, string keyword ) {
+    protected Dictionary< string, string > getWordsPhones( string language, ref GrammarFileStruct[ ] grammars, ref string keyword ) {
         if ( language != string.Empty ) {
             string dictName = string.Empty;
             onRecieveLogMess( "lang:" + language);
@@ -148,8 +177,9 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
             }
             if ( dictName != string.Empty ) {
                 Dictionary< string, string > baseDict = readDictionaryFromResources( dictName );
-                if ( baseDict == null ) Debug.Log( "getWordsPhones empty dict" ); else Debug.Log( "getWordsPhones dict" );
-                return getActualDictionary( ref baseDict, grammars, keyword );
+                if ( baseDict == null )
+                    this.onError( "getWordsPhones empty dict" ); 
+                return getActualDictionary( ref baseDict, ref grammars, ref keyword );
             }
             else
                 return null;
@@ -179,27 +209,43 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour
     /// <param name="grammars">слова для внесения в актуальный словарь</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь со словами из GrammarFileStruct</returns>
-    private Dictionary<string, string> getActualDictionary( ref Dictionary< string, string > dict, GrammarFileStruct[ ] grammars, string keyword ) {
-        Dictionary<string, string> actualDict = new Dictionary<string, string>();
+    private Dictionary<string, string> getActualDictionary( ref Dictionary< string, string > dict, ref GrammarFileStruct[ ] grammars, ref string keyword ) {
+        Dictionary<string, string> actualDict = new Dictionary<string, string>( );
         foreach ( GrammarFileStruct grammar in grammars ) {
             foreach ( string word in grammar.words ) {
-                if ( dict.ContainsKey( word ) ) {
-                    if ( !actualDict.ContainsKey( word ) ) {
-                        actualDict.Add( word, dict[ word ] );
+                var wLow = word.ToLower( );
+                var wUpper = word.ToUpper( );
+                if ( dict.ContainsKey( wLow ) ) {
+                    grammar.replace( word, wLow );
+                    if ( !actualDict.ContainsKey( wLow ) ) {
+                        actualDict.Add( wLow, dict[ wLow ] );
+                    } else
+                        this.onError( "dictionary already contains word [" + wLow + "]" );
+                } else {
+                    grammar.replace( word, wUpper );
+                    if ( dict.ContainsKey( wUpper ) ) {
+                        if ( !actualDict.ContainsKey( wUpper ) ) {
+                            actualDict.Add( wUpper, dict[ wUpper ] );
+                        } else
+                            this.onError( "dictionary already contains word [" + wUpper + "]" );
                     }
-                    else
-                        this.errorMessage( "dictionary already contains word [" + word + "]" );
                 }
-                else
-                    this.errorMessage( "word [" + word + "] not found" );
             }
         }
-            
+        var kLow = keyword.ToLower( );
+        var kUpper = keyword.ToUpper( );
         if ( keyword != string.Empty ) {
-            if ( dict.ContainsKey( keyword ) && !actualDict.ContainsKey( keyword ) )
-                actualDict.Add( keyword, dict[ keyword ] );
-            else
-                this.errorMessage( "keyword [" + keyword + "] not found" );
+            if ( dict.ContainsKey( kLow ) ) {
+                keyword = kLow;
+                if ( !actualDict.ContainsKey( kLow ) )
+                    actualDict.Add( kLow, dict[ kLow ] );
+            } else
+                if ( dict.ContainsKey( kUpper ) ) {
+                    keyword = kUpper;
+                    if ( !actualDict.ContainsKey( kUpper ) )
+                        actualDict.Add( kUpper, dict[ kUpper ] );
+                } //else
+                    //this.errorMessage( "keyword [" + kUpper + "] not found" );
         } 
         return actualDict;
     }

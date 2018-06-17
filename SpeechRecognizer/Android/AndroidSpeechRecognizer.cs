@@ -13,21 +13,24 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
     private GrammarFileStruct[ ] _grammars = null;
     private string _keyword = string.Empty;
 
-    public override void initialization( string language, GrammarFileStruct[] grammars, string keyword ) {
-        this.logFromRecognizer.Invoke( "start initialization" );
+    public override void initialization( string language, GrammarFileStruct[ ] grammars, string keyword ) {
+        //this.logFromRecognizer.Invoke( "start initialization" );
+        this.onRecieveLogMess( "start initialization" );
         this.getBaseGrammar( grammars );
 
-        AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaClass unity = new AndroidJavaClass( "com.unity3d.player.UnityPlayer" );
         if ( unity == null ) {
-            this.logFromRecognizer.Invoke("empty java class");
-            this.initResult?.Invoke( false );
+            this.onError( "empty java class" );
+            //this.initResult.Invoke( false );
+            this.onInitResult( FALSE );
             return;
         }
 
         _recognizerActivity = unity.GetStatic< AndroidJavaObject >("currentActivity");
         if ( _recognizerActivity == null ) {
-            this.logFromRecognizer.Invoke( "empty java object" );
-            this.initResult?.Invoke( false );
+            this.onError( "empty java object" );
+            this.initResult.Invoke( false );
+            this.onInitResult( FALSE );
             return;
         }
 
@@ -39,19 +42,17 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
         _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_INITIALIZATION_COMPLETE_METHOD, "onInitResult");
         #endregion
         _recognizerActivity.Call( JavaWrapperMethodNames.SET_BASE_GRAMMAR_FILE, _baseGrammar );
-        this.logFromRecognizer.Invoke( JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP );
+        this.onRecieveLogMess( JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP );
         _recognizerActivity.Call( JavaWrapperMethodNames.RUN_RECOGNIZER_SETUP, language );
 
+        _phonesDict = getWordsPhones( language, ref grammars, ref keyword );
         _grammars = grammars;
-        _phonesDict = getWordsPhones( language, grammars, keyword );
         _keyword = keyword;
     }
 
-    protected override void onInitResult( string value )
-    {
+    protected override void onInitResult( string value ) {
         onRecieveLogMess( "onInitResult:" + value );
-        foreach ( string word in _phonesDict.Keys )
-        {
+        foreach ( string word in _phonesDict.Keys ) {
             //this.logFromRecognizer( "add word:" + word + " phones:" + _phonesDict[ word ] );
             _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_WORD_INTO_DICTIONARY, word, _phonesDict[ word ] );
         }
@@ -71,16 +72,17 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
         if ( _keyword != string.Empty )
         {
             _recognizerActivity.Call<bool>(JavaWrapperMethodNames.SET_KEYWORD, _keyword );
-            this.logFromRecognizer( "add keyword:" + _keyword );
+            this.onRecieveLogMess( "add keyword:" + _keyword );
         }
         #endregion
 
         _init = Boolean.Parse( value );
-        BaseSpeechRecognizer._instance.initResult?.Invoke( _init );
+        this.onInitResult( value );
+        //BaseSpeechRecognizer._instance.initResult.Invoke( _init );
     }
 
     public override void startListening( ) {
-        this.logFromRecognizer( "startListening:" + _init.ToString( ) );
+        this.onRecieveLogMess( "startListening:" + _init.ToString( ) );
         if ( _init ) {
             _recognizerActivity.Call( JavaWrapperMethodNames.START_LISTENING );
         }
