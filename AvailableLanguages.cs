@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AvailableLanguages
-{
-    static class Language
-    {
+namespace AvailableLanguages {
+    static class Language {
         public const string en_US = "en_US";
         public const string ru_RU = "ru_RU";
         public const string fr_FR = "fr_FR";

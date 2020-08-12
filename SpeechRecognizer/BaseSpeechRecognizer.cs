@@ -21,6 +21,10 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
 
     private const string ERROR_ON_SPEECH_RECOGNIZER_IS_NULL = "BaseSpeechRecognizer singleton null";
 
+    private void OnDestroy( ) {
+        //this.stopListening( );
+    }
+
     protected abstract void setKeywordThreshold( double pValue = 1e+10f );
     /// <summary>
     /// порог срабатывания при распознавании ключевого слова
@@ -92,8 +96,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// переопределяет файл грамматики поумолчанию
     /// </summary>
     /// <param name="grammarName">имя файла грамматики</param>
-    public void setBaseGrammarName( string grammarName )
-    {
+    public void setBaseGrammarName( string grammarName ) {
         _baseGrammar = grammarName;
     }
     /// <summary>
@@ -193,10 +196,10 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="dictName">имя словаря</param>
     /// <returns>словарь (слово, транскрипция)</returns>
     private Dictionary< string, string > readDictionaryFromResources( string dictName ) {
-        ResourceManager rm = new ResourceManager( "MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly( ) );
+        var rm = new ResourceManager( "MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly( ) );
         if ( rm != null ) {
-            string dataText = rm.GetString( dictName );
-            Dictionary<string, string> transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( ' ' )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
+            var dataText = rm.GetString( dictName );
+            var transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( ' ' )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
             return transriptionContainer;
         }
         else
@@ -210,24 +213,29 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь со словами из GrammarFileStruct</returns>
     private Dictionary<string, string> getActualDictionary( ref Dictionary< string, string > dict, ref GrammarFileStruct[ ] grammars, ref string keyword ) {
-        Dictionary<string, string> actualDict = new Dictionary<string, string>( );
-        foreach ( GrammarFileStruct grammar in grammars ) {
-            foreach ( string word in grammar.words ) {
-                var wLow = word.ToLower( );
-                var wUpper = word.ToUpper( );
-                if ( dict.ContainsKey( wLow ) ) {
-                    grammar.replace( word, wLow );
-                    if ( !actualDict.ContainsKey( wLow ) ) {
-                        actualDict.Add( wLow, dict[ wLow ] );
-                    } else
-                        this.onError( "dictionary already contains word [" + wLow + "]" );
-                } else {
-                    grammar.replace( word, wUpper );
-                    if ( dict.ContainsKey( wUpper ) ) {
-                        if ( !actualDict.ContainsKey( wUpper ) ) {
-                            actualDict.Add( wUpper, dict[ wUpper ] );
+        var actualDict = new Dictionary<string, string>( );
+
+        foreach ( var grammar in grammars ) {
+            foreach ( var w in grammar.commands ) {
+
+                var wLst = w.Split( ' ' );
+                foreach ( var word in wLst ) {
+                    var wLow = word.ToLower( );
+                    var wUpper = word.ToUpper( );
+                    if ( dict.ContainsKey( wLow ) ) {
+                        grammar.replace( word, wLow );
+                        if ( !actualDict.ContainsKey( wLow ) ) {
+                            actualDict.Add( wLow, dict [ wLow ] );
                         } else
-                            this.onError( "dictionary already contains word [" + wUpper + "]" );
+                            this.onError( "dictionary already contains word [" + wLow + "]" );
+                    } else {
+                        grammar.replace( word, wUpper );
+                        if ( dict.ContainsKey( wUpper ) ) {
+                            if ( !actualDict.ContainsKey( wUpper ) ) {
+                                actualDict.Add( wUpper, dict [ wUpper ] );
+                            } else
+                                this.onError( "dictionary already contains word [" + wUpper + "]" );
+                        }
                     }
                 }
             }

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using AvailableLanguages;
+using System;
 
 /// <summary>
 /// Обёртка для распознавания голоса под различные платформы
 /// </summary>
-public class MultiplatformSpeechRecognizer {
+public class MultiplatformSpeechRecognizer : IDisposable {
     private BaseSpeechRecognizer _speechRecognizer = null;
     /// <summary>
     /// конструктор
@@ -40,8 +41,8 @@ public class MultiplatformSpeechRecognizer {
             return;
         // все слова в нижний регистр
         foreach ( GrammarFileStruct grammar in grammars ) {
-            for ( int i = 0; i < grammar.words.Length; i++ ) {
-                grammar.words[ i ] = grammar.words[ i ].ToLower( );
+            for ( int i = 0; i < grammar.commands.Length; i++ ) {
+                grammar.commands[ i ] = grammar.commands[ i ].ToLower( );
             }
         }
         _speechRecognizer.keywordThreshold = threshold;
@@ -114,5 +115,9 @@ public class MultiplatformSpeechRecognizer {
     public void searchKeyword( ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.searchKeyword( );
+    }
+
+    public void Dispose( ) {
+        _speechRecognizer = null;
     }
 }

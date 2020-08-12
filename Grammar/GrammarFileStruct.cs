@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿using System.Text;
+/// <summary>
 /// структура описывающая файл грамматики
 /// </summary>
 [System.Serializable]
@@ -10,27 +11,26 @@ public class GrammarFileStruct {
     /// <summary>
     /// массив слов
     /// </summary>
-    public string[ ] words;
+    public string[ ] commands;
     /// <summary>
     /// преобразует структуру в формализованную строку грамматики
     /// </summary>
     /// <returns>формализованная строка</returns>
     public string toString( ) {
-        string value;
-        value = "#JSGF V1.0;";
-        value += "grammar commands;";
-        value += "<commands> = ";
+        var sb = new StringBuilder( );
+        sb.Append( "#JSGF V1.0;" );
+        sb.Append( "grammar commands;" );
+        sb.Append( "public <command> = " );
 
-        for ( int i = 0; i < words.Length; i++ ) {
-            //words[ i ] = words[ i ];
-            value += words[ i ];
-            if ( i != words.Length - 1 )
-                value += " | ";
+        for ( int i = 0; i < commands.Length; i++ ) {
+            sb.Append( "(" );
+            sb.Append( commands [ i ].ToLower( ) );
+            sb.Append( ")" );
+            if ( i != commands.Length - 1 )
+                sb.Append( " | " );
         }
-        value += ";";
-        value += "public <command> = <commands>+;";
-
-        return value;
+        sb.Append( ";" );
+        return sb.ToString( );
     }
     /// <summary>
     /// Костыль. Необходим для формирования грамматики для 
@@ -42,9 +42,9 @@ public class GrammarFileStruct {
     /// <param name="to">слово словаря</param>
     /// <returns></returns>
     public bool replace( string from, string to ) {
-        for ( int i = 0; i < words.Length; i++ ) {
-            if ( words[ i ] == from ) {
-                words[ i ] = to;
+        for ( int i = 0; i < commands.Length; i++ ) {
+            if ( commands[ i ] == from ) {
+                commands[ i ] = to;
                 return true;
             }
         }
