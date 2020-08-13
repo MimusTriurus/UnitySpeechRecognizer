@@ -107,4 +107,8 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
     void Awake( ) {
         BaseSpeechRecognizer._instance = this;
     }
+
+    public override void setVadThreshold( double value ) {
+        Debug.LogWarning( "AndroidSpeechRecognizer. setVadThreshold not implemented yet!" );
+    }
 }

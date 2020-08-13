@@ -10,40 +10,12 @@ using System.Resources;
 /// базовый класс распознования голоса. От него наследуют классы WindowsSpeechRecognizer, AndroidSpeechRecognizer, LinuxSpeechRecognizer
 /// </summary>
 internal abstract class BaseSpeechRecognizer : MonoBehaviour {
-    protected const string TRUE = "true";
-    protected const string FALSE = "false";
-
-    protected const string ERROR_ON_INIT = "crash on init ";
-    protected const string ERROR_ON_ADD_GRAMMAR = "crash on add grammar ";
-    protected const string ERROR_ON_ADD_WORD = "crash on add word into dictionary ";
-    protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
-    protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
-
-    private const string ERROR_ON_SPEECH_RECOGNIZER_IS_NULL = "BaseSpeechRecognizer singleton null";
-
-    private void OnDestroy( ) {
-        //this.stopListening( );
-    }
-
-    protected abstract void setKeywordThreshold( double pValue = 1e+10f );
     /// <summary>
     /// порог срабатывания при распознавании ключевого слова
     /// </summary>
     public double keywordThreshold {
         set { setKeywordThreshold( value ); }
     }
-    /// <summary>
-    /// результат инициализации speechRecognizer
-    /// </summary>
-    protected bool _init = false;
-    /// <summary>
-    /// интервал в милисекундах
-    /// </summary>
-    protected float _interval = 100;
-    /// <summary>
-    /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
-    /// </summary>
-    protected static BaseSpeechRecognizer _instance = null;
     /// <summary>
     /// сигнал с сообщением отладки из библиотеки распознования
     /// </summary>
@@ -64,11 +36,15 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <summary>
     /// начало записи голоса с микрофона
     /// </summary>
-    public abstract void startListening( );
+    public virtual void startListening( ) {
+        _isListening = true;
+    }
     /// <summary>
     /// окончание записи голоса с микрофона
     /// </summary>
-    public abstract void stopListening( );
+    public virtual void stopListening( ) {
+        _isListening = false;
+    }
     /// <summary>
     /// смена граматики(перечень слов доступных для распознавания)
     /// </summary>
@@ -86,12 +62,6 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="keyword">ключевое слово</param>
     /// <returns>результат инициализации</returns>
     public abstract void initialization( string language, GrammarFileStruct[ ] grammars, string keyword );
-
-    #region baseGrammar
-    /// <summary>
-    /// имя файла грамматики поумолчанию
-    /// </summary>
-    protected string _baseGrammar = string.Empty;
     /// <summary>
     /// переопределяет файл грамматики поумолчанию
     /// </summary>
@@ -99,6 +69,16 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     public void setBaseGrammarName( string grammarName ) {
         _baseGrammar = grammarName;
     }
+    /// <summary>
+    /// Устанавливает порог срабатывания для Voice Activity Detection
+    /// </summary>
+    /// <param name="value">Значение порога срабатывания для Voice Activity Detection</param>
+    public abstract void setVadThreshold( double value );
+    #region baseGrammar
+    /// <summary>
+    /// имя файла грамматики поумолчанию
+    /// </summary>
+    protected string _baseGrammar = string.Empty;
     /// <summary>
     /// устанавливает файл грамматики поумолчанию равным первому элементу из массива структур грамматики
     /// </summary>
@@ -109,7 +89,6 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
         }
     }
     #endregion
-       
     protected virtual void onInitResult( string value ) {
         _init = Boolean.Parse( value );
         if ( BaseSpeechRecognizer._instance != null )
@@ -191,6 +170,30 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
             return null;
     }
     /// <summary>
+    /// результат инициализации speechRecognizer
+    /// </summary>
+    protected bool _init = false;
+    /// <summary>
+    /// интервал в милисекундах
+    /// </summary>
+    protected float _interval = 100;
+    /// <summary>
+    /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
+    /// </summary>
+    protected static BaseSpeechRecognizer _instance = null;
+    
+    protected const string TRUE = "true";
+    protected const string FALSE = "false";
+
+    protected const string ERROR_ON_INIT = "crash on init ";
+    protected const string ERROR_ON_ADD_GRAMMAR = "crash on add grammar ";
+    protected const string ERROR_ON_ADD_WORD = "crash on add word into dictionary ";
+    protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
+    protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
+
+    protected bool _isListening = false;
+    protected abstract void setKeywordThreshold( double pValue = 1e+10f );
+    /// <summary>
     /// считывание полного(базового) словаря из ресурсов
     /// </summary>
     /// <param name="dictName">имя словаря</param>
@@ -256,5 +259,10 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
                     //this.errorMessage( "keyword [" + kUpper + "] not found" );
         } 
         return actualDict;
+    }
+
+    private const string ERROR_ON_SPEECH_RECOGNIZER_IS_NULL = "BaseSpeechRecognizer singleton null";
+    private void OnDestroy( ) {
+        this.stopListening( );
     }
 }

@@ -6,7 +6,6 @@ using System;
 /// Обёртка для распознавания голоса под различные платформы
 /// </summary>
 public class MultiplatformSpeechRecognizer : IDisposable {
-    private BaseSpeechRecognizer _speechRecognizer = null;
     /// <summary>
     /// конструктор
     /// </summary>
@@ -31,7 +30,7 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     /// <param name="grammars">массив грамматик со словами</param>
     /// <param name="keyword">ключевое слово инициирующее поиск (ok google)</param>
     /// <param name="threshold">порог срабатывания ключеового слова</param>
-    public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f ) {
+    public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f, double vadThreshold = 4.0 ) {
         //readDictionaryFromResources("");
         if ( _speechRecognizer == null )
             return;
@@ -46,6 +45,7 @@ public class MultiplatformSpeechRecognizer : IDisposable {
             }
         }
         _speechRecognizer.keywordThreshold = threshold;
+        _speechRecognizer.setVadThreshold( vadThreshold );
         initSpeechRecognizer( language, grammars, keyword );
     }
 
@@ -120,4 +120,6 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     public void Dispose( ) {
         _speechRecognizer = null;
     }
+
+    private BaseSpeechRecognizer _speechRecognizer = null;
 }
