@@ -2,14 +2,11 @@
 using AvailableLanguages;
 using System;
 
-/// <summary>
-/// Обёртка для распознавания голоса под различные платформы
-/// </summary>
 public class MultiplatformSpeechRecognizer : IDisposable {
     /// <summary>
-    /// конструктор
+    /// Constructor
     /// </summary>
-    /// <param name="parent">родительский объект unity на который будет добавлен компонент BaseSpeechRecognizer</param>
+    /// <param name="parent">Parent object onto which component BaseSpeechRecognizer will be added</param>
     public MultiplatformSpeechRecognizer( MonoBehaviour parent ) {
         switch ( Application.platform ) {
             case RuntimePlatform.Android:       parent.gameObject.AddComponent<AndroidSpeechRecognizer>( ); break;
@@ -24,14 +21,14 @@ public class MultiplatformSpeechRecognizer : IDisposable {
         }
     }
     /// <summary>
-    /// инициализация платформозависимого распознавателя голоса 
+    /// Initiating the object MultiplatformSpeechRecognizer
     /// </summary>
-    /// <param name="language">язык - для выбора директории с языковой моделью и словарём</param>
-    /// <param name="grammars">массив грамматик со словами</param>
-    /// <param name="keyword">ключевое слово инициирующее поиск (ok google)</param>
-    /// <param name="threshold">порог срабатывания ключеового слова</param>
+    /// <param name="language">Language - for choosing of directory with language model and dictionary</param>
+    /// <param name="grammars">List of grammars with words</param>
+    /// <param name="keyword">Keyword initiating the search (ok google)</param>
+    /// <param name="threshold">Threshold of triggering of keyword</param>
+    /// <param name="threshold">Threshold of voice activity detection</param>
     public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f, double vadThreshold = 4.0 ) {
-        //readDictionaryFromResources("");
         if ( _speechRecognizer == null )
             return;
         if ( grammars == null )
@@ -49,37 +46,33 @@ public class MultiplatformSpeechRecognizer : IDisposable {
         initSpeechRecognizer( language, grammars, keyword );
     }
 
-    private void initSpeechRecognizer( string language, GrammarFileStruct[ ] grammars, string keyword ) {
-        _speechRecognizer.initialization( language, grammars, keyword );
-    }
-
     #region определяем методы-приёмники результатов работы библиотеки распознавания
     /// <summary>
-    /// устанавливает связь сигнала со слотом получения результатов распознавания
+    /// Sets callback function to receive results of recognition
     /// </summary>
-    /// <param name="resultReciever">интерфейсная ссылка на объект приёмник</param>
+    /// <param name="resultReciever">interface link to the object - receiver</param>
     public void setResultRecieverMethod( IGetResult resultReciever ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.recognitionResult += resultReciever.getResult;
     }
     /// <summary>
-    /// устанавливает связь сигнала со слотом получения сообщений для вывода в лог
+    /// Sets callback function to receive messages
     /// </summary>
-    /// <param name="messagesReciever">интерфейсная ссылка на объект приёмник</param>
+    /// <param name="messagesReciever">interface link to the object - receiver</param>
     public void setMessagesFromLogRecieverMethod( IGetLogMessages messagesReciever ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.logFromRecognizer += messagesReciever.getLogMessages;
     }
     /// <summary>
-    ///  устанавливает связь сигнала со слотом получения сообщений об ошибках для вывода в лог
+    ///  Sets callback function to receive error messages
     /// </summary>
-    /// <param name="crashMessReciever">интерфейсная ссылка на объект приёмник</param>
+    /// <param name="crashMessReciever">interface link to the object - receiver</param>
     public void setCrashMessagesRecieverMethod( IGetCrashMessages crashMessReciever ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.errorMessage += crashMessReciever.getCrashMessages;
     }
     /// <summary>
-    /// устанавливает связь сигнала со слотом получения результатов инициализации
+    /// Sets callback function to receive results of initialization
     /// </summary>
     /// <param name="initResultReciever"></param>
     public void setInitResultRecieverMethod( IGetInitResult initResultReciever ) {
@@ -88,29 +81,29 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     }
     #endregion
     /// <summary>
-    /// микрофон на запись - начало распознавания
+    /// Switches the microphone on - start of recognition
     /// </summary>
     public void startListening( ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.startListening( );
     }
     /// <summary>
-    /// отключение микрофона - конец распознавания
+    /// Switches the microphone off - end of recognition
     /// </summary>
     public void stopListening( ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.stopListening( );
     }
     /// <summary>
-    /// меняем грамматику.меняем набор слов доступных для распознавания
+    /// Changes the grammar - List of commands for recognition
     /// </summary>
-    /// <param name="grammarName">имя грамматики или ключевое слово</param>
+    /// <param name="grammarName">Name of the grammar</param>
     public void switchGrammar( string grammarName ) {
         if ( _speechRecognizer != null )
             _speechRecognizer.switchGrammar( grammarName );
     }
     /// <summary>
-    /// инициализируем поиск ключевого слова (OK GOOGLE)
+    /// Switches the mode of keyword search on (OK GOOGLE)
     /// </summary>
     public void searchKeyword( ) {
         if ( _speechRecognizer != null )
@@ -122,4 +115,8 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     }
 
     private BaseSpeechRecognizer _speechRecognizer = null;
+
+    private void initSpeechRecognizer( string language, GrammarFileStruct [ ] grammars, string keyword ) {
+        _speechRecognizer.initialization( language, grammars, keyword );
+    }
 }
