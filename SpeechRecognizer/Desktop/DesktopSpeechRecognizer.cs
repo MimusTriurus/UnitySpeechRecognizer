@@ -182,9 +182,6 @@ internal class DesktopSpeechRecognizer : BaseSpeechRecognizer {
             yield return new WaitForSeconds( interval );
         }
     }
-    /// <summary>
-    /// порог срабатывания ключевого слова
-    /// </summary>
         
     private void Awake( ) {
         BaseSpeechRecognizer._instance = this;

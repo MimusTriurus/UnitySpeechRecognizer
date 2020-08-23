@@ -70,6 +70,13 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
         _baseGrammar = grammarName;
     }
     /// <summary>
+    /// Интервал опроса микрофона
+    /// </summary>
+    /// <param name="value"></param>
+    public void setTimeoutInterval( float value ) {
+        this._interval = value;
+    }
+    /// <summary>
     /// Устанавливает порог срабатывания для Voice Activity Detection
     /// </summary>
     /// <param name="value">Значение порога срабатывания для Voice Activity Detection</param>
@@ -119,7 +126,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     protected void onRecognitionResult( string message ) {
         if ( BaseSpeechRecognizer._instance != null )
             if ( BaseSpeechRecognizer._instance.recognitionResult != null ) 
-                BaseSpeechRecognizer._instance.recognitionResult.Invoke( message );
+                BaseSpeechRecognizer._instance.recognitionResult.Invoke( message.ToLower( ) );
             else
                 UnityEngine.Debug.LogError( "use setResultRecieverMethod method!" );
         else
@@ -176,7 +183,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <summary>
     /// интервал в милисекундах
     /// </summary>
-    protected float _interval = 100;
+    protected float _interval = 50;
     /// <summary>
     /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
     /// </summary>

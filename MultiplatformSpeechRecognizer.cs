@@ -28,7 +28,7 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     /// <param name="keyword">Keyword initiating the search (ok google)</param>
     /// <param name="threshold">Threshold of triggering of keyword</param>
     /// <param name="threshold">Threshold of voice activity detection</param>
-    public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f, double vadThreshold = 4.0 ) {
+    public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f, double vadThreshold = 4.0, float timeoutInterval = 50.0f ) {
         if ( _speechRecognizer == null )
             return;
         if ( grammars == null )
@@ -36,13 +36,14 @@ public class MultiplatformSpeechRecognizer : IDisposable {
         if ( grammars.Length == 0 )
             return;
         // все слова в нижний регистр
-        foreach ( GrammarFileStruct grammar in grammars ) {
+        foreach ( var grammar in grammars ) {
             for ( int i = 0; i < grammar.commands.Length; i++ ) {
                 grammar.commands[ i ] = grammar.commands[ i ].ToLower( );
             }
         }
         _speechRecognizer.keywordThreshold = threshold;
         _speechRecognizer.setVadThreshold( vadThreshold );
+        _speechRecognizer.setTimeoutInterval( timeoutInterval );
         initSpeechRecognizer( language, grammars, keyword );
     }
 

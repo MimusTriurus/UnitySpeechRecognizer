@@ -24,7 +24,7 @@ public class GrammarFileStruct {
 
         for ( int i = 0; i < commands.Length; i++ ) {
             sb.Append( "(" );
-            sb.Append( commands [ i ].ToLower( ) );
+            sb.Append( commands [ i ] );
             sb.Append( ")" );
             if ( i != commands.Length - 1 )
                 sb.Append( " | " );
@@ -43,12 +43,9 @@ public class GrammarFileStruct {
     /// <returns></returns>
     public bool replace( string from, string to ) {
         for ( int i = 0; i < commands.Length; i++ ) {
-            if ( commands[ i ] == from ) {
-                commands[ i ] = to;
-                return true;
-            }
+            commands [ i ] = commands [ i ].Replace( from, to );
         }
-        return false;
+        return true;
     }
 }
 
