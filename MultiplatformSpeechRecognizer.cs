@@ -27,7 +27,8 @@ public class MultiplatformSpeechRecognizer : IDisposable {
     /// <param name="grammars">List of grammars with words</param>
     /// <param name="keyword">Keyword initiating the search (ok google)</param>
     /// <param name="threshold">Threshold of triggering of keyword</param>
-    /// <param name="threshold">Threshold of voice activity detection</param>
+    /// <param name="vadThreshold">Threshold of voice activity detection</param>
+    /// <param name="timeoutInterval">Reading interval of microphone buffer</param>
     public void init( string language = Language.en_US, GrammarFileStruct[ ] grammars = null, string keyword = "", double threshold = 1e+10f, double vadThreshold = 4.0, float timeoutInterval = 50.0f ) {
         if ( _speechRecognizer == null )
             return;
