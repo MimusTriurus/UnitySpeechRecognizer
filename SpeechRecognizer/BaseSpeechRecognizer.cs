@@ -81,6 +81,9 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// </summary>
     /// <param name="value">Значение порога срабатывания для Voice Activity Detection</param>
     public abstract void setVadThreshold( double value );
+    public void addPairG2P( PairG2P pair ) {
+        _unknownWords.Add( pair );
+    }
     #region baseGrammar
     /// <summary>
     /// имя файла грамматики поумолчанию
@@ -167,8 +170,19 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
             if ( dictName != string.Empty ) {
                 Dictionary< string, string > baseDict = readDictionaryFromResources( dictName );
                 if ( baseDict == null )
-                    this.onError( "getWordsPhones empty dict" ); 
-                return getActualDictionary( ref baseDict, ref grammars, ref keyword );
+                    this.onError( "getWordsPhones empty dict" );
+
+                checkRegistr( baseDict );
+                var actualDict = getActualDictionary( ref baseDict, ref grammars, ref keyword );
+
+                foreach ( var pair in _unknownWords ) {
+                    var k = ( _graphemeIsLower ) ? pair.Grapheme.ToLower( ) : pair.Grapheme.ToUpper( );
+                    // не актуально для ряда словарей - встречаются буквы в разном регистре
+                    //var v = ( _phonemeIsLower ) ? pair.Phoneme.ToLower( ) : pair.Phoneme.ToUpper( );
+                    var v = pair.Phoneme;
+                    actualDict [ k ] = v;
+                }
+                return actualDict;
             }
             else
                 return null;
@@ -198,6 +212,8 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     protected const string ERROR_ON_SWITCH_GRAMMAR = "crash on switch grammar ";
     protected const string ERROR_ON_START_LISTENING = "crash on start listening ";
 
+    protected const char DELIMITER = ' ';
+
     protected bool _isListening = false;
     protected abstract void setKeywordThreshold( double pValue = 1e+10f );
     /// <summary>
@@ -209,7 +225,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
         var rm = new ResourceManager( "MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly( ) );
         if ( rm != null ) {
             var dataText = rm.GetString( dictName );
-            var transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( ' ' )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
+            var transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( DELIMITER )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
             return transriptionContainer;
         }
         else
@@ -222,49 +238,38 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="grammars">слова для внесения в актуальный словарь</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь со словами из GrammarFileStruct</returns>
-    private Dictionary<string, string> getActualDictionary( ref Dictionary< string, string > dict, ref GrammarFileStruct[ ] grammars, ref string keyword ) {
+    private Dictionary<string, string> getActualDictionary( ref Dictionary<string, string> dict, ref GrammarFileStruct [ ] grammars, ref string keyword ) {
         var actualDict = new Dictionary<string, string>( );
 
         foreach ( var grammar in grammars ) {
             foreach ( var w in grammar.commands ) {
-
-                var wLst = w.Split( ' ' );
+                var wLst = w.Split( DELIMITER );
                 foreach ( var word in wLst ) {
-                    var wLow = word.ToLower( );
-                    var wUpper = word.ToUpper( );
-                    if ( dict.ContainsKey( wLow ) ) {
-                        grammar.replace( word, wLow );
-                        if ( !actualDict.ContainsKey( wLow ) ) {
-                            actualDict.Add( wLow, dict [ wLow ] );
+                    var dictKey = string.Empty;
+                    if ( _graphemeIsLower )
+                        dictKey = word.ToLower( );
+                    else
+                        dictKey = word.ToUpper( );
+                    if ( dict.ContainsKey( dictKey ) ) {
+                        grammar.replace( word, dictKey );
+                        if ( !actualDict.ContainsKey( dictKey ) ) {
+                            actualDict.Add( dictKey, dict [ dictKey ] );
                         } else
-                            this.onError( "dictionary already contains word [" + wLow + "]" );
-                    } else {
-                        grammar.replace( word, wUpper );
-                        if ( dict.ContainsKey( wUpper ) ) {
-                            if ( !actualDict.ContainsKey( wUpper ) ) {
-                                actualDict.Add( wUpper, dict [ wUpper ] );
-                            } else
-                                this.onError( "dictionary already contains word [" + wUpper + "]" );
-                        }
+                            this.onRecieveLogMess( "dictionary already contains word [" + dictKey + "]" );
                     }
                 }
             }
         }
-        var kLow = keyword.ToLower( );
-        var kUpper = keyword.ToUpper( );
+        if ( _graphemeIsLower )
+            keyword = keyword.ToLower( );
+        else
+            keyword = keyword.ToUpper( );
         if ( keyword != string.Empty ) {
-            if ( dict.ContainsKey( kLow ) ) {
-                keyword = kLow;
-                if ( !actualDict.ContainsKey( kLow ) )
-                    actualDict.Add( kLow, dict[ kLow ] );
-            } else
-                if ( dict.ContainsKey( kUpper ) ) {
-                    keyword = kUpper;
-                    if ( !actualDict.ContainsKey( kUpper ) )
-                        actualDict.Add( kUpper, dict[ kUpper ] );
-                } //else
-                    //this.errorMessage( "keyword [" + kUpper + "] not found" );
-        } 
+            if ( dict.ContainsKey( keyword ) ) {
+                if ( !actualDict.ContainsKey( keyword ) )
+                    actualDict.Add( keyword, dict [ keyword ] );
+            }
+        }
         return actualDict;
     }
 
@@ -272,4 +277,18 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     private void OnDestroy( ) {
         this.stopListening( );
     }
+
+    private List<PairG2P> _unknownWords = new List<PairG2P>( );
+
+    private void checkRegistr( Dictionary<string, string> wordsDict ) {
+        var middleIndex = wordsDict.Count / 2;
+        var key = wordsDict.ElementAt( middleIndex ).Key;
+        var val = wordsDict.ElementAt( middleIndex ).Value;
+        _graphemeIsLower = char.IsLower( key, 0 );
+        _phonemeIsLower = char.IsLower( val, 0 );
+    }
+    private bool _graphemeIsLower  = true;
+    private bool _phonemeIsLower = true;
+
+
 }

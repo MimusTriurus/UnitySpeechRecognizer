@@ -50,13 +50,13 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
         }
     }
 
-    public override void initialization( string language, GrammarFileStruct[ ] grammars, string keyword ) {
+    public override void initialization( string language, GrammarFileStruct [ ] grammars, string keyword ) {
         this.onRecieveLogMess( "start initialization" );
         this.getBaseGrammar( grammars );
 
         var javaUnityPlayer = new AndroidJavaClass( "com.unity3d.player.UnityPlayer" );
         var currentActivity = javaUnityPlayer.GetStatic<AndroidJavaObject>( "currentActivity" );
-        
+
         _recognizerActivity = new AndroidJavaObject( "com.sss.breter.voicerecognizer.MainActivity", currentActivity );//unity.GetStatic< AndroidJavaObject >( "com.sss.breter.voicerecognizer.MainActivity" );
         if ( _recognizerActivity == null ) {
             this.onError( "empty java object" );
@@ -67,8 +67,7 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
         #region инициализируем колбэк из jar библиотеки
         try {
             _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_RECIEVER_OBJECT_NAME.ToString( ), this.gameObject.name );
-        }
-        catch (Exception ex ) {
+        } catch ( Exception ex ) {
             this.onError( ex.Message );
         }
         _recognizerActivity.CallStatic( JavaWrapperMethodNames.SET_LOG_RECIEVER_METHOD_NAME, "onRecieveLogMess" );
@@ -88,20 +87,20 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
         onRecieveLogMess( "onInitResult:" + value );
 
         foreach ( string word in _phonesDict.Keys ) {
-            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_WORD_INTO_DICTIONARY, word, _phonesDict[ word ] );
+            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_WORD_INTO_DICTIONARY, word, _phonesDict [ word ] );
         }
- 
-        string[ ] grammar = new string[ 2 ]; 
-        foreach ( GrammarFileStruct gramm in _grammars ) { 
-            grammar[ 0 ] = gramm.name; 
-            grammar[ 1 ] = gramm.toString( );
+
+        string[ ] grammar = new string[ 2 ];
+        foreach ( GrammarFileStruct gramm in _grammars ) {
+            grammar [ 0 ] = gramm.name;
+            grammar [ 1 ] = gramm.toString( );
             //onRecieveLogMess( "GRAMM" + gramm.toString( ) ); 
-            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_GRAMMAR_STRING, grammar[ 0 ], grammar[ 1 ] );
-        } 
+            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.ADD_GRAMMAR_STRING, grammar [ 0 ], grammar [ 1 ] );
+        }
 
         #region добавляем ключевое слово(ok google) для поиска
         if ( _keyword != string.Empty ) {
-            _recognizerActivity.Call<bool>(JavaWrapperMethodNames.SET_KEYWORD, _keyword );
+            _recognizerActivity.Call<bool>( JavaWrapperMethodNames.SET_KEYWORD, _keyword );
             this.onRecieveLogMess( "add keyword:" + _keyword );
         }
         #endregion
@@ -127,7 +126,7 @@ internal class AndroidSpeechRecognizer : BaseSpeechRecognizer {
     }
 
     public override void searchKeyword( ) {
-        _recognizerActivity.Call< bool >( JavaWrapperMethodNames.SET_SEARCH_KEYWORD );
+        _recognizerActivity.Call<bool>( JavaWrapperMethodNames.SET_SEARCH_KEYWORD );
     }
 
     protected override void setKeywordThreshold( double pValue = 10000000000 ) {

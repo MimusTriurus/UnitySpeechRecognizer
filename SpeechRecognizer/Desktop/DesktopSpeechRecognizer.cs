@@ -96,7 +96,7 @@ internal class DesktopSpeechRecognizer : BaseSpeechRecognizer {
         this.onRecieveLogMess( "start initialization" );
         bool result = false;
         #region инициализируем SpeechRecognizer
-        var destination = Application.streamingAssetsPath + "/acousticModels/" + language + "/";
+        var destination = Application.streamingAssetsPath + "/GameVoiceControl/acousticModels/" + language + "/";
         result = runRecognizerSetup( _sp, destination );
         if ( !result ) {
             this.onError( ERROR_ON_INIT + " " + destination );
@@ -128,7 +128,7 @@ internal class DesktopSpeechRecognizer : BaseSpeechRecognizer {
 
         #region добавляем граматику
         string[ ] grammar = new string[ 2 ];
-        foreach ( GrammarFileStruct gramm in grammars ) {
+        foreach ( var gramm in grammars ) {
             grammar[ 0 ] = gramm.name;
             grammar[ 1 ] = gramm.toString( );
             this.onRecieveLogMess( "try add grammar" + grammar[ 1 ] );

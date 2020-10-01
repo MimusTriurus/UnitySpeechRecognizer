@@ -111,6 +111,13 @@ public class MultiplatformSpeechRecognizer : IDisposable {
         if ( _speechRecognizer != null )
             _speechRecognizer.searchKeyword( );
     }
+    /// <summary>
+    /// Adding made-up word
+    /// </summary>
+    /// <param name="pair">Pair of Grapheme (word) and Phoneme (transcription)</param>
+    public void addPairG2P( PairG2P pair ) {
+        _speechRecognizer.addPairG2P( pair );
+    }
 
     public void Dispose( ) {
         _speechRecognizer = null;
