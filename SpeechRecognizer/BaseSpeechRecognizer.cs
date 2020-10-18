@@ -61,7 +61,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>результат инициализации</returns>
-    public abstract void initialization( string language, GrammarFileStruct[ ] grammars, string keyword );
+    public abstract void initialization( string language, GrammarFileStruct [ ] grammars, string keyword );
     /// <summary>
     /// переопределяет файл грамматики поумолчанию
     /// </summary>
@@ -93,9 +93,9 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// устанавливает файл грамматики поумолчанию равным первому элементу из массива структур грамматики
     /// </summary>
     /// <param name="grammars">массив со структурами грамматики(имя грамматики и массив слов)</param>
-    protected void getBaseGrammar( GrammarFileStruct[ ] grammars ) {
+    protected void getBaseGrammar( GrammarFileStruct [ ] grammars ) {
         if ( _baseGrammar == string.Empty ) {
-            _baseGrammar = grammars[ 0 ].name;
+            _baseGrammar = grammars [ 0 ].name;
         }
     }
     #endregion
@@ -128,7 +128,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="message"></param>
     protected void onRecognitionResult( string message ) {
         if ( BaseSpeechRecognizer._instance != null )
-            if ( BaseSpeechRecognizer._instance.recognitionResult != null ) 
+            if ( BaseSpeechRecognizer._instance.recognitionResult != null )
                 BaseSpeechRecognizer._instance.recognitionResult.Invoke( message.ToLower( ) );
             else
                 UnityEngine.Debug.LogError( "use setResultRecieverMethod method!" );
@@ -155,10 +155,9 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// <param name="grammars">список слов для внесения в словарь</param>
     /// <param name="keyword">ключевое слово</param>
     /// <returns>актуальный словарь (слово, транскрипция)</returns>
-    protected Dictionary< string, string > getWordsPhones( string language, ref GrammarFileStruct[ ] grammars, ref string keyword ) {
+    protected Dictionary<string, string> getWordsPhones( string language, ref GrammarFileStruct [ ] grammars, ref string keyword ) {
         if ( language != string.Empty ) {
             string dictName = string.Empty;
-            onRecieveLogMess( "lang:" + language);
             switch ( language ) {
                 case Language.en_US: dictName = "EngDictionary"; break;
                 case Language.es_ES: dictName = "EspDictionary"; break;
@@ -166,9 +165,15 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
                 case Language.de_DE: dictName = "GerDictionary"; break;
                 case Language.it_IT: dictName = "ItDictionary"; break;
                 case Language.ru_RU: dictName = "RuDictionary"; break;
+                // new
+                case Language.hi_IN: dictName = "HiDictionary"; break;
+                case Language.nl_NL: dictName = "DutDictionary"; break;
+                case Language.pt_PT: dictName = "PtDictionary"; break;
+                // not implemented
+                case Language.zh_CN: dictName = "ZnDictionary"; break;
             }
             if ( dictName != string.Empty ) {
-                Dictionary< string, string > baseDict = readDictionaryFromResources( dictName );
+                var baseDict = readDictionaryFromResources( dictName );
                 if ( baseDict == null )
                     this.onError( "getWordsPhones empty dict" );
 
@@ -183,11 +188,9 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
                     actualDict [ k ] = v;
                 }
                 return actualDict;
-            }
-            else
+            } else
                 return null;
-        }
-        else
+        } else
             return null;
     }
     /// <summary>
@@ -202,7 +205,7 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// статическая ссылка на самого себя чтобы сборщик мусора не уничтожал его
     /// </summary>
     protected static BaseSpeechRecognizer _instance = null;
-    
+
     protected const string TRUE = "true";
     protected const string FALSE = "false";
 
@@ -221,14 +224,13 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
     /// </summary>
     /// <param name="dictName">имя словаря</param>
     /// <returns>словарь (слово, транскрипция)</returns>
-    private Dictionary< string, string > readDictionaryFromResources( string dictName ) {
+    private Dictionary<string, string> readDictionaryFromResources( string dictName ) {
         var rm = new ResourceManager( "MultiplatformSpeechRecognizer.Dictionaries", Assembly.GetExecutingAssembly( ) );
         if ( rm != null ) {
             var dataText = rm.GetString( dictName );
             var transriptionContainer = dataText.TrimEnd( '\n' ).Split( '\n' ).ToDictionary( item => item.Split( DELIMITER )[ 0 ], item => item.Remove( 0, item.IndexOf( " " ) + 1 ) );
             return transriptionContainer;
-        }
-        else
+        } else
             return null;
     }
     /// <summary>
@@ -256,7 +258,8 @@ internal abstract class BaseSpeechRecognizer : MonoBehaviour {
                             actualDict.Add( dictKey, dict [ dictKey ] );
                         } else
                             this.onRecieveLogMess( "dictionary already contains word [" + dictKey + "]" );
-                    }
+                    } else
+                        this.onError( "dict not contains:" + dictKey );
                 }
             }
         }

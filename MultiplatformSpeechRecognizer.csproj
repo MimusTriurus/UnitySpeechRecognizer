@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Unity\TestVoiceControl\Assets\GameVoiceControl\Plugins\</OutputPath>
+    <OutputPath>..\..\Unity\GameVoiceControl\Assets\GameVoiceControl\Plugins\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,11 +45,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine.AndroidJNIModule">
-      <HintPath>..\..\..\..\Soft\Unity\Hub\Editor\2020.1.0f1\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_nondevelopment_il2cpp\Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
+      <HintPath>..\..\..\Soft\Unity\Hub\Editor\2019.4.11f1\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_nondevelopment_il2cpp\Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\Soft\Unity\Hub\Editor\2020.1.0f1\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_nondevelopment_il2cpp\Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\Soft\Unity\Hub\Editor\2019.4.11f1\Editor\Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_nondevelopment_il2cpp\Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -96,6 +96,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RuDictionary.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DutDictionary.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HiDictionary.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ZnDictionary.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PtDictionary.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
