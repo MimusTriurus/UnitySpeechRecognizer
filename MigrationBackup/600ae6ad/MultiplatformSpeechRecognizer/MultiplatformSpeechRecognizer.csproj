@@ -47,6 +47,12 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Unity3D.SDK.2020.1.13.1\lib\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Unity3D.SDK.2020.1.13.1\lib\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvailableLanguages.cs" />
@@ -75,6 +81,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\EngDictionary.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -103,11 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\PtDictionary.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Unity3D.SDK">
-      <Version>2020.1.13.1</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
